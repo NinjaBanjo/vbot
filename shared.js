@@ -29,7 +29,7 @@ function factoidFindHelper(bot, context, text, suppressSearch) {
 			    found = bot.factoids.search(text);
 
 			found = found.map(function(item) {
-				return "\x033"+item+"\x0F";
+				return item;
 			});
 
 			if (found.length) {
@@ -51,7 +51,7 @@ var Shared = module.exports = {
 		FeelingLucky(text + " -site:w3schools.com", function(data) {
 			if (data) {
 				context.channel.send_reply (context.intent, 
-					"\x02"+data.title+"\x0F \x032<"+data.url+">\x0F", {color: true});
+					data.title+" <"+data.url+">", {color: true});
 			} else {
 				context.channel.send_reply (context.sender, "No search results found.");
 			}

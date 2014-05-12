@@ -34,18 +34,18 @@ JSBot.prototype.init = function() {
 
 	//this.register_listener(/^(\S+)(\+\+|--);?$/, this.do_beers);
 
-	this.register_command("g", Shared.google, {
-		help: "Run this command with a search query to return the first Google result. Usage: !g kitten images"});
+	this.register_command("google", Shared.google, {
+		help: "Run this command with a search query to return the first Google result. Usage: google kitten images"});
 
 	this.register_command("mdn", this.mdn, {
-		help: "Search the Mozilla Developer Network. Usage: !mdn bitwise operators"});
+		help: "Search the Mozilla Developer Network. Usage: mdn bitwise operators"});
 	this.register_command("mdc", "mdn");
 
 	this.register_command("ecma", this.ecma, {
-		help: "Lookup a section from the ECMAScript spec. Usage: !ecma null value"});
+		help: "Lookup a section from the ECMAScript spec. Usage: ecma null value"});
 
 	this.register_command("caniuse", this.caniuse, {
-		help: "Search the caniuse.com database. Usage: !caniuse webgl"});
+		help: "Search the caniuse.com database. Usage: caniuse webgl"});
 	this.register_command("ciu", "caniuse");
 
 	this.register_command("find", Shared.find);
@@ -59,11 +59,11 @@ JSBot.prototype.init = function() {
 
 	this.register_command("learn", Shared.learn, {
 		allow_intentions: false,
-		help: "Add factoid to bot. Usage: !learn ( [alias] foo = bar | foo =~ s/expression/replace/gi )"});
+		help: "Add factoid to bot. Usage: learn ( [alias] foo = bar | foo =~ s/expression/replace/gi )"});
 
 	this.register_command("forget", Shared.forget, {
 		allow_intentions: false,
-		help: "Remove factoid from bot. Usage: !forget foo"});
+		help: "Remove factoid from bot. Usage: forget foo"});
 
 	this.register_command("commands", Shared.commands);
 
@@ -95,25 +95,6 @@ JSBot.prototype.there_is_no_try = function(context, text) {
 		context.channel.send_reply(context.sender, "Do or do not; there is no try. --Yoda");
 		arguments.callee.last_invocation = now;
 
-	}
-};
-
-
-JSBot.prototype.do_beers = function(context, text, nick, operation) {
-	/**
-	 * /(\S+)\s*(?:(\+\+|--)|=\s*(?:\1)\s*(\+|-)\s*1);?/
-	 * TODO: More advanced beer management
-	 **/
-	if (operation === "++") {
-		if (nick.toLowerCase() !== "c") {
-			context.channel.send_reply(context.sender, "Even if " + nick +
-				" deserves any beer, I don't have any to spare.");
-		} else {
-			context.channel.send_reply(context.sender, "C doesn't deserve beer.");
-		}
-	} else {
-		context.channel.send_action(
-			"steals a beer a from " + nick + ", since we're taking 'em.");
 	}
 };
 
@@ -181,9 +162,6 @@ JSBot.prototype.mdn = function(context, text, command) {
 JSBot.prototype.command_not_found = function(context, text) {
 	Shared.findPlus.call(this, context, text, !context.priv);
 };
-
-// JSON.stringify([].slice.call(document.querySelectorAll('#toc-full a')).map(function(v) {return {title: v.firstChild.textContent, id: v.href.replace(/.+#/, '')};}));
-// Use that to generate the required JSON from es5.github.io with Firefox
 
 JSBot.prototype.ecma = function(context, text) {
 	try {

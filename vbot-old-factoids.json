@@ -856,7 +856,7 @@
 		},
 		"foo": {
 			"value": "bar",
-			"popularity": 10,
+			"popularity": 11,
 			"editors": [
 				"Mortchek",
 				"emerson"
@@ -1983,6 +1983,14 @@
 			"popularity": 0,
 			"creator": "ljharb",
 			"editors": []
+		},
+		"bjork": {
+			"value": "open source is like letting anyone with a wrench modify a bridge",
+			"creator": "emerson",
+			"date": "2014-05-12T03:10:29.519Z",
+			"popularity": 1,
+			"editors": [],
+			"changes": []
 		}
 	},
 	"delete_log": []
