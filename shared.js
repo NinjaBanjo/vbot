@@ -133,8 +133,11 @@ var Shared = module.exports = {
 	},
 	
 	learn: function(context, text) {
-	
 		try {
+			if (context.sender.name !== 'emerson') {
+				context.channel.send_reply(context.sender, "Sorry, only certain people can change factoids. Contact emerson if you want to be able to change them.");
+				return;
+			}
 			var parsed = text.match(/^(alias)?\s*("[^"]*"|.+?)\s*(=~?)\s*(.+)$/i);
 			if (!parsed) {
 				throw new SyntaxError(
@@ -256,6 +259,10 @@ var Shared = module.exports = {
 			context.client.get_user("ChanServ")
 				.send("TOPIC "+context.channel.name+" "+topic);
 		}
+	},
+
+	ping: function(context, text) {
+		context.channel.send_reply (context.sender, "Pong!");
 	},
 
 	reauthenticate: function(context, text) {

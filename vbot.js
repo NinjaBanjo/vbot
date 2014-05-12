@@ -13,14 +13,14 @@ var Shared = require("./shared");
 
 
 var JSBot = function(profile) {
-	this.sandbox = new Sandbox(path.join(__dirname, "ecmabot-utils.js"));
-	this.factoids = new FactoidServer(path.join(__dirname, "ecmabot-factoids.json"));
+	this.sandbox = new Sandbox(path.join(__dirname, "vbot-utils.js"));
+	this.factoids = new FactoidServer(path.join(__dirname, "vbot-old-factoids.json"));
 	this.caniuse_server = new CanIUseServer;
 	this.executeRegex = /^((?:sm|v8|js|>>?|\|)>)([^>].*)+/;
 
 	Bot.call(this, profile);
 	this.set_log_level(this.LOG_ALL);
-	this.set_trigger("!"); // Exclamation
+	this.set_trigger("emersonbot: "); // Exclamation
 };
 
 
@@ -37,18 +37,12 @@ JSBot.prototype.init = function() {
 	this.register_command("g", Shared.google, {
 		help: "Run this command with a search query to return the first Google result. Usage: !g kitten images"});
 
-	this.register_command("google", this.google, {
-		help: "Returns a link to a Google search page of the search term. Usage: !google opencourseware computational complexity"});
-
 	this.register_command("mdn", this.mdn, {
 		help: "Search the Mozilla Developer Network. Usage: !mdn bitwise operators"});
 	this.register_command("mdc", "mdn");
 
 	this.register_command("ecma", this.ecma, {
 		help: "Lookup a section from the ECMAScript spec. Usage: !ecma null value"});
-
-	this.register_command("re", this.re, {
-		help: "Usage: !re Your text here /expression/gi || FLAGS: (g: global match, i: ignore case)"});
 
 	this.register_command("caniuse", this.caniuse, {
 		help: "Search the caniuse.com database. Usage: !caniuse webgl"});
@@ -57,6 +51,7 @@ JSBot.prototype.init = function() {
 	this.register_command("find", Shared.find);
 
 	this.register_command("help", this.help);
+	this.register_command("ping", Shared.ping);
 
 	this.register_command("auth", Shared.reauthenticate, {
 		allow_intentions: false,
@@ -220,7 +215,7 @@ JSBot.prototype.ecma = function(context, text) {
 
 
 JSBot.prototype.load_ecma_ref = function() {
-	var filename = path.join(__dirname, "ecmabot-reference.json");
+	var filename = path.join(__dirname, "vbot-ecma-reference.json");
 	util.puts("Loading ECMA-262 reference...");
 	var bot = this;
 	file.readFile(filename, function (err, data) {
@@ -249,5 +244,5 @@ JSBot.prototype.caniuse = function(context, text) {
 	}
 };
 
-var profile = require("./ecmabot-profile.js");
+var profile = require("./vbot-profile.js");
 (new JSBot(profile)).init();

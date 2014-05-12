@@ -855,10 +855,49 @@
 			"popularity": 108
 		},
 		"foo": {
-			"value": "foo, bar, baz, and quux are commonly used metasyntactic variables. They stand for whatever you want. See http://www.catb.org/jargon/html/M/metasyntactic-variable.html",
-			"popularity": 7,
+			"value": "bar",
+			"popularity": 10,
 			"editors": [
-				"Mortchek"
+				"Mortchek",
+				"emerson"
+			],
+			"changes": [
+				{
+					"date": "2014-05-11T21:22:13.507Z",
+					"editor": "emerson",
+					"old-value": "foo, bar, baz, and quux are commonly used metasyntactic variables. They stand for whatever you want. See http://www.catb.org/jargon/html/M/metasyntactic-variable.html",
+					"new-value": "bar"
+				},
+				{
+					"date": "2014-05-11T21:29:06.952Z",
+					"editor": "emerson",
+					"old-value": "bar",
+					"new-value": "g test"
+				},
+				{
+					"date": "2014-05-11T21:42:48.692Z",
+					"editor": "emerson",
+					"old-value": "g test",
+					"new-value": "bar"
+				},
+				{
+					"date": "2014-05-11T21:46:24.197Z",
+					"editor": "emerson",
+					"old-value": "bar",
+					"new-value": "bar"
+				},
+				{
+					"date": "2014-05-11T21:48:13.780Z",
+					"editor": "emerson",
+					"old-value": "bar",
+					"new-value": "bar"
+				},
+				{
+					"date": "2014-05-11T21:50:39.820Z",
+					"editor": "emerson",
+					"old-value": "bar",
+					"new-value": "bar"
+				}
 			]
 		},
 		"expect": {
@@ -1945,6 +1984,6 @@
 			"creator": "ljharb",
 			"editors": []
 		}
-	}
+	},
+	"delete_log": []
 }
-
