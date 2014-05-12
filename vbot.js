@@ -32,14 +32,11 @@ JSBot.prototype.init = function() {
 
 	this.register_listener(this.executeRegex, Shared.execute_js);
 
-	//this.register_listener(/^(\S+)(\+\+|--);?$/, this.do_beers);
-
 	this.register_command("google", Shared.google, {
 		help: "Run this command with a search query to return the first Google result. Usage: google kitten images"});
 
 	this.register_command("mdn", this.mdn, {
 		help: "Search the Mozilla Developer Network. Usage: mdn bitwise operators"});
-	this.register_command("mdc", "mdn");
 
 	this.register_command("ecma", this.ecma, {
 		help: "Lookup a section from the ECMAScript spec. Usage: ecma null value"});
@@ -48,9 +45,6 @@ JSBot.prototype.init = function() {
 		help: "Search the caniuse.com database. Usage: caniuse webgl"});
 	this.register_command("ciu", "caniuse");
 
-	this.register_command("find", Shared.find);
-
-	this.register_command("help", this.help);
 	this.register_command("ping", Shared.ping);
 
 	this.register_command("auth", Shared.reauthenticate, {
@@ -72,32 +66,6 @@ JSBot.prototype.init = function() {
 	this.load_ecma_ref();
 
 };
-
-
-JSBot.prototype.google = function(context, text) {
-
-	if (!text) {
-		context.channel.send_reply (context.sender, this.get_command_help("google"));
-		return;
-	}
-
-	context.channel.send_reply (context.intent, "Google search: \""+text+"\" <http://www.google.com/search?q="+encodeURIComponent(text)+">");
-};
-
-
-JSBot.prototype.there_is_no_try = function(context, text) {
-	var hours = 1000*60*60;
-	var now = +new Date();
-
-	if (now > arguments.callee.last_invocation + 3*hours ||
-		typeof arguments.callee.last_invocation === "undefined") {
-
-		context.channel.send_reply(context.sender, "Do or do not; there is no try. --Yoda");
-		arguments.callee.last_invocation = now;
-
-	}
-};
-
 
 JSBot.prototype.re = function(context, msg) {
 	// Okay first we need to check for the regex literal at the end
@@ -133,22 +101,6 @@ JSBot.prototype.re = function(context, msg) {
 		context.channel.send_reply(context.sender, this.get_command_help("re"));
 	}
 };
-
-
-
-JSBot.prototype.help = function(context, text) {
-
-	try {
-		if (!text) {
-			return this.command_not_found (context, "help");
-		}
-
-		context.channel.send_reply(context.intent, this.get_command_help(text));
-	} catch(e) {
-		context.channel.send_reply(context.sender, e);
-	}
-};
-
 
 JSBot.prototype.mdn = function(context, text, command) {
 	if (!text) {

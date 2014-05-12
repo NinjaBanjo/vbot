@@ -167,21 +167,6 @@ var Shared = module.exports = {
 				return;
 
 			/* Replacing the text of a factoid based on regular expression */
-			} else if (operation === "=~") {
-				var regexinfo = parse_regex_literal (value);
-				var regex = regexinfo[0];
-				var old = this.factoids.find(factoid, false);
-				var result = old.replace(regex, regexinfo[1]);
-
-				if (old === result) {
-					context.channel.send_reply(context.sender, "Nothing changed.");
-				} else {
-					this.factoids.learn(factoid, result, context.sender.name, value);
-					context.channel.send_reply(context.sender, "Changed `"+factoid+
-						"` to: "+result);
-				}
-				return;
-
 			}
 
 		} catch (e) {
@@ -191,8 +176,12 @@ var Shared = module.exports = {
 	
 	forget: function(context, text) {
 		try {
+			if (context.sender.name !== 'emerson') {
+				context.channel.send_reply(context.sender, "yea, you're not allowed to change factoids. It's not personal, I promise :) Ask emerson to add you to my list.");
+				return;
+			}
 			this.factoids.forget(text, context.sender.name);
-			context.channel.send_reply(context.sender, "Forgot '"+text+"'.");
+			context.channel.send_reply(context.sender, "I don't know anything about '"+text+"' anymore.");
 		} catch(e) {
 			context.channel.send_reply(context.sender, e);
 		}
@@ -200,10 +189,14 @@ var Shared = module.exports = {
 
 
 	commands: function(context, text) {
-		var commands = this.get_commands();
-		var trigger = this.__trigger;
-		context.channel.send_reply (context.intent,
-			"Valid commands are: " + trigger + commands.join(", " + trigger));
+		if(context.priv){
+			var commands = this.get_commands();
+			var trigger = this.__trigger;
+			context.channel.send_reply (context.intent,
+				"Valid commands are: " + trigger + commands.join(", " + trigger));
+		}
+		else context.channel.send_reply (context.intent,
+				"Output too noisy. PM me for this one.");
 	},
 
 	find: function(context, text) {
