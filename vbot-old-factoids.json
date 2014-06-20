@@ -28,7 +28,7 @@
 			"alias": "closures"
 		},
 		"paste": {
-			"value": "Paste links, not code. http://gist.github.com is great. Sites like http://jsbin.com/, http://jsfiddle.net/, and http://www.webdevout.net/test let people easily run your code, but can be slow. Please do not use http://pastebin.com, the reasons are many. See !pastebin",
+			"value": "Paste links, not code. Sites like http://jsbin.com/, http://jsfiddle.net/, and http://www.webdevout.net/test let people easily run your code, but can be slow. Please do not use http://pastebin.com, the reasons are many.",
 			"popularity": 398,
 			"editors": [
 				"niggler",
@@ -41,7 +41,7 @@
 			"popularity": 32
 		},
 		"code": {
-			"value": "Show some code. Code examples should be complete (sufficient to show the problem) and minimal (as short as possible while remaining complete). Go to http://jsbin.com/ or see !paste.",
+			"value": "Show some code. Code examples should be complete (sufficient to show the problem) and minimal (as short as possible while remaining complete). Ask me about paste.",
 			"popularity": 266,
 			"editors": [
 				"CoverSlide"
@@ -763,10 +763,6 @@
 		"best": {
 			"alias": "fastest"
 		},
-		"next": {
-			"value": "Another satisfied customer! NEXT!!",
-			"popularity": 97
-		},
 		"iife": {
 			"value": "An \"Immediately-invoked function expression\" is an expression that both creates and calls a function. As with any function call, a scope is created. \"(function () { /* ... */ }())\" is a common form. For more info: http://benalman.com/news/2010/11/immediately-invoked-function-expression/",
 			"popularity": 150
@@ -804,14 +800,6 @@
 			"value": "http://dominik.honnef.co/posts/2011/07/don_t_abbreviate__thanks____sorry__or__please_/",
 			"popularity": 1
 		},
-		"format": {
-			"value": "\"inimino: It is ridiculous to use formatting conventions as a proxy for code quality. ...snip... If you are reduced to picking software on the basis of whether the author prefers your particular coding style or not, you may just as well admit that you do not know how to discern code quality and flip a coin instead.\"",
-			"popularity": 1
-		},
-		"kitten": {
-			"value": "Whenever you pass a String to setTimeout, God kills a kitten! Think of the poor kittens! Since passing JS in a string to these functions means an implicit eval, you likely don't want that. Also see: first-class functions;",
-			"popularity": 2
-		},
 		"first-class functions": {
 			"value": "Functions in JavaScript are first class. This means you can pass it around, store it in variables and do anything you'd do with other objects. I.e.: The following are both valid: var foo = {}; console.log(foo); and var foo = function(){ }; console.log(foo);",
 			"popularity": 3,
@@ -819,23 +807,12 @@
 				"eboy"
 			]
 		},
-		"doubleyea": {
-			"value": "yea YEAAAAH *screeching guitar*",
-			"popularity": 4
-		},
-		"hey": {
-			"value": "\"!ho\"",
-			"popularity": 13
-		},
-		"hughfdjackson": {
-			"value": "\"https://github.com/hughfdjackson\""
-		},
 		"regexp": {
 			"value": "Regular Expressions in Javascript: http://www.evolt.org/article/Regular_Expressions_in_JavaScript/17/36435/ .. or more generally: http://www.regular-expressions.info/. Useful tester: http://regexpal.com/",
 			"popularity": 9
 		},
 		"ide": {
-			"value": "\"vim\"",
+			"value": "\"nano\"",
 			"popularity": 7
 		},
 		"prototype intro": {
@@ -930,13 +907,6 @@
 			"value": "Some useful resources for learning js: https://developer.mozilla.org/en-US/learn/javascript. Also see !eloquent",
 			"popularity": 6
 		},
-		"hug": {
-			"value": "Big old bear hug!",
-			"popularity": 1
-		},
-		"oink": {
-			"value": "^(oo)^"
-		},
 		"live": {
 			"value": "Give us some live code, so we don't have to do it for you. http://jsfiddle.net and http://jsbin.com are great!"
 		},
@@ -969,14 +939,6 @@
 			"value": "'For a robust list of ES5 compatibility charts, see Kangax's page at : <http://kangax.github.com/es5-compat-table/>'",
 			"popularity": 0
 		},
-		"stupidintheroom": {
-			"value": "'It is you'",
-			"popularity": 0
-		},
-		"fortpark": {
-			"value": "'There is no fortpark fish here'",
-			"popularity": 1
-		},
 		"work": {
 			"alias": "jobs"
 		},
@@ -984,12 +946,8 @@
 			"value": "don't show us examples that include mistakes out of laziness and ask us why it's not working. We'll tell you about those mistakes. Seriously. What else did you expect?",
 			"popularity": 3
 		},
-		"amiallowed": {
-			"value": "Yes, you're allowed to add factoids!",
-			"popularity": 2
-		},
 		"rtfm": {
-			"value": "This is a problem you should be able to solve yourself with research. Please be so kind as to read the funky manual. For library-specific problems, read their documentation or visit their channel. For javascript documentation, see: !mdn 'foo' and !ecma 'foo'",
+			"value": "This is a problem you should be able to solve yourself with research. Please be so kind as to read the funky manual. For library-specific problems, read their documentation or visit their channel.",
 			"popularity": 11
 		},
 		"public": {
@@ -1001,8 +959,7 @@
 			"popularity": 2
 		},
 		"premature optimisation": {
-			"value": "See !premature optimization",
-			"popularity": 6
+			"alias": "premature optimization"
 		},
 		"premature optimization": {
 			"value": "Worrying about effeciency without first identifying real bottlenecks that affect the end-user leads to hard to read, hard to maintain code; and is far slower to write. Unless you can prove that it causes significant and noticeable slow-down, you've probably got bigger things to worry about.",
@@ -1587,12 +1544,6 @@
 			"creator": "ljharb",
 			"editors": []
 		},
-		"jq": {
-			"value": "\"something that should die\"",
-			"popularity": 1,
-			"creator": "niggler",
-			"editors": []
-		},
 		"pyramid": {
 			"value": "Pyramid of Doom: A coding style that uses several levels of anonymous functions creating a pyramid like structure in the indented whitespace when viewed on it's side. http://tritarget.org/blog/2012/11/28/the-pyramid-of-doom-a-javascript-style-trap/",
 			"popularity": 4,
@@ -1619,49 +1570,11 @@
 			"creator": "NoiseEee",
 			"editors": []
 		},
-		"learn": {
-			"value": "learn",
-			"popularity": 0,
-			"creator": "CoverSlide",
-			"editors": [
-				"Maxdamantus"
-			]
-		},
-		"crockford": {
-			"value": "javascript zealot",
-			"popularity": 5,
-			"creator": "niggler",
-			"editors": []
-		},
-		"cockford": {
-			"alias": "crockford"
-		},
-		"toodles": {
-			"value": "emasculated good-bye",
-			"popularity": 1,
-			"creator": "niggler",
-			"editors": []
-		},
-		"eboy": {
-			"value": "god",
-			"popularity": 0,
-			"creator": "niggler",
-			"editors": []
-		},
-		"god": {
-			"value": "eboy",
-			"popularity": 0,
-			"creator": "niggler",
-			"editors": []
-		},
 		"caps": {
 			"value": "stop resting your coffee mug on shift.  it damages your keyboard",
 			"popularity": 1,
 			"creator": "hughfdjackson",
 			"editors": []
-		},
-		"sod off": {
-			"alias": "shoo"
 		},
 		"unobtrusive": {
 			"value": "http://en.wikipedia.org/wiki/Unobtrusive_JavaScript",
@@ -1676,15 +1589,6 @@
 				"gkatsev"
 			]
 		},
-		"constructors": {
-			"alias": "constructor"
-		},
-		"nextleap": {
-			"value": "my fucking array contains the fucking motherfucking shitfuck pair.",
-			"popularity": 0,
-			"creator": "PigDude",
-			"editors": []
-		},
 		"vanillajs": {
 			"value": "The most lightweight JavaScript framework out there: http://vanilla-js.com/",
 			"popularity": 0,
@@ -1698,12 +1602,6 @@
 			"value": "I'm a bot!",
 			"popularity": 4,
 			"creator": "lilmonkey",
-			"editors": []
-		},
-		"@": {
-			"value": "!<handler> @<user>",
-			"popularity": 2,
-			"creator": "hemanth_",
 			"editors": []
 		},
 		"sop": {
@@ -1730,7 +1628,7 @@
 			]
 		},
 		"jobs": {
-			"value": "##javascript is not a jobs forum.  Check out #css-lance for work",
+			"value": "This channel is not a jobs forum.  Check out #css-lance for work",
 			"popularity": 2,
 			"creator": "niggler",
 			"editors": [
@@ -1744,12 +1642,6 @@
 			"value": "A next-generation JavaScript (ES6) virtual machine written in last-generation JavaScript (ES3) http://benvie.github.com/continuum",
 			"popularity": 2,
 			"creator": "Benvie",
-			"editors": []
-		},
-		"hamster": {
-			"value": "Java is to Javascript like ham is to hamster.",
-			"popularity": 1,
-			"creator": "ljharb",
 			"editors": []
 		},
 		"setinterval": {
@@ -1791,18 +1683,6 @@
 			"value": "Nashorn is an upcoming JavaScript engine created by Oracle and programmed in Java. http://en.wikipedia.org/wiki/Nashorn_(JavaScript_engine)",
 			"popularity": 0,
 			"creator": "Benvie",
-			"editors": []
-		},
-		"beer": {
-			"value": "Don't mind if I do! Glug glug glug!",
-			"popularity": 5,
-			"creator": "CoverSlide",
-			"editors": []
-		},
-		"stop": {
-			"value": "collaborate and listen",
-			"popularity": 3,
-			"creator": "eboy",
 			"editors": []
 		},
 		"module patterns": {
@@ -1853,12 +1733,6 @@
 			"value": "http://shipitsquirrel.github.com/",
 			"popularity": 1,
 			"creator": "gkatsev",
-			"editors": []
-		},
-		"niggler": {
-			"value": "YOU JUST GOT NIGGL'D!",
-			"popularity": 6,
-			"creator": "j201",
 			"editors": []
 		},
 		"callbacks": {
