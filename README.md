@@ -1,14 +1,14 @@
-oftn-bot
+vbot
 ========
 
-This is the repository for both of the IRC bots oftn-bot (in #oftn on freenode) and ecmabot (in ##javascript on freenode). This was originally created as a replacement for v8bot (http://github.com/eisd/v8bot). Over time, it changed to include a full-featured IRC bot library.
+This is vbot, a Node.js IRC bot for web developers. 
 
 
 Features
 --------
 
 * Manages bot commands with an easy API
-* Support for "intents" which is when you append "@ user" after a bot command, so the bot can reply to that person
+* Support for "intents" which is when you append "@ user" after a bot command, so the bot can reply to that person (not currently working)
 * Context object provides information about bot command invocations, including:
   * Who invoked the command
   * Who was it "intended" for
@@ -23,8 +23,6 @@ Features
 * Includes extra optional libraries:
   * FactoidServ: Manages a list of factoids which are saved and loaded to disk automatically
   * FeelingLucky: Performs a quick Google "I'm Feeling Lucky" search
-  * JSONSaver: Saves and loads arbitrary JavaScript objects to disk automatically (used by FactoidServ)
-  * Sandbox: Runs JavaScript in a seperate process to allow for users to run code. (Uses v8, but a compiled SpiderMonkey "shovel" is available that uses js185 shared libraries)
 
 API
 ---
@@ -59,7 +57,7 @@ Adds a regular expression listeners to incoming traffic on all servers. When the
 * 2nd subpattern
 * ...
 
-### bot.register_command(command, callback, options)
+### bot.register_command(command, callback)
 Adds a command.
 
 * command: A string value for the command
@@ -75,5 +73,24 @@ When the command is called, the callback is called with the arguments:
 Additional Documentation
 ------------------------
 
-This bot AND/OR bot library is still being developed, but those are some of the basic commands. Look at your-bot-here.js for a simple example of an IRC bot using this API, or ecmabot.js for a more complex and featured example.
+This bot AND/OR bot library is still being developed, but those are some of the basic commands. 
+
+Sample Profile
+---
+
+Copy this to 
+
+module.exports = [{
+	host: 'chat.freenode.net',
+	port: 6667,
+	user: 'yournick',
+	nick: 'yournick',
+	real: 'yournick',
+
+	password: 'yourpass',
+
+	channels: [
+		'#whatever'
+	]
+}];
 

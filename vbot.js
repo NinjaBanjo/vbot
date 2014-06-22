@@ -20,7 +20,7 @@ var JSBot = function(profile) {
 
 	Bot.call(this, profile);
 	this.set_log_level(this.LOG_ALL);
-	this.set_trigger("vbot: ");
+	this.set_trigger("emersonbot");
 };
 
 
@@ -32,34 +32,32 @@ JSBot.prototype.init = function() {
 
 	this.register_listener(this.executeRegex, Shared.execute_js);
 
-	this.register_command("google", Shared.google, {
-		help: "Run this command with a search query to return the first Google result. Usage: google kitten images"});
+	this.register_command("google", Shared.google);
+	this.register_command("g", "google");
 
-	this.register_command("mdn", this.mdn, {
-		help: "Search the Mozilla Developer Network. Usage: mdn bitwise operators"});
+	this.register_command("mdn", this.mdn);
 
-	this.register_command("ecma", this.ecma, {
-		help: "Lookup a section from the ECMAScript spec. Usage: ecma null value"});
+	this.register_command("ecma", this.ecma);
 
-	this.register_command("caniuse", this.caniuse, {
-		help: "Search the caniuse.com database. Usage: caniuse webgl"});
+	this.register_command("caniuse", this.caniuse);
 	this.register_command("ciu", "caniuse");
 
 	this.register_command("ping", Shared.ping);
 
-	this.register_command("auth", Shared.reauthenticate, {
-		allow_intentions: false,
-		help: "Attempt to re-authenticate with NickServ."});
+	this.register_command("are you a bot?", Shared.amibot);
+	this.register_command("what are you?", 'are you a bot?');
+	this.register_command("who are you?", 'are you a bot?');
+	this.register_command("bot", 'are you a bot?');
 
-	this.register_command("learn", Shared.learn, {
-		allow_intentions: false,
-		help: "Add factoid to bot. Usage: learn ( [alias] foo = bar | foo =~ s/expression/replace/gi )"});
+	this.register_command("auth", Shared.reauthenticate);
 
-	this.register_command("forget", Shared.forget, {
-		allow_intentions: false,
-		help: "Remove factoid from bot. Usage: forget foo"});
+	this.register_command("learn", Shared.learn);
+
+	this.register_command("forget", Shared.forget);
 
 	this.register_command("commands", Shared.commands);
+
+	this.register_command("op", Shared.opbot);
 
 	this.on('command_not_found', this.command_not_found);
 

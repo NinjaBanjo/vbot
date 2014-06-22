@@ -58,80 +58,6 @@ var Shared = module.exports = {
 		});
 	},
 	
-	
-	execute_js: function(context, text, command, code) {
-		var engine,
-		    person = context.sender;
-	
-		/* This should be temporary. */
-		if (!context.priv) {
-			if (command === "v8>" && context.channel.userlist["v8bot"]) {
-				return;
-			}
-			if (command === "js>" && context.channel.userlist["gbot2"]) {
-				return;
-			}
-		}
-	
-		switch (command) {
-		case "|>": /* Multi-line input */
-			person.js = person.js || {timeout: null, code: []};
-			/* Clear input buffer after a minute */
-			clearTimeout (person.js.timeout);
-			person.js.timeout = setTimeout (function() {
-				person.js.code.length = 0;
-				context.channel.send_reply (context.sender, "Your `|>` line input has been cleared. (1 minute)");
-			}, 1000 * 60);
-			person.js.code.push (code);
-			return;
-		case "h>":
-		case "hs>":
-			engine = Sandbox.Haskell; break;
-		case ">>>":
-		case "v>":
-		case "v8>":
-			// context.channel.send_reply(context.intent, "v8 temporarily disabled, please use js> instead."); return;
-			engine = Sandbox.V8; break;
-		default:
-			engine = Sandbox.SpiderMonkey; break;
-		}
-
-		if (person.js && person.js.code.length) {
-			code = person.js.code.join("\n") + "\n" + code;
-			person.js.code.length = 0;
-			clearTimeout (person.js.timeout);
-		}
-
-		this.sandbox.run(engine, 4000, code, function(result) {
-			var reply;
-
-			try {
-				/* If theres an error, show that.
-				   If not, show the type along with the result */
-				if (result.error !== null) {
-					reply = result.error;
-				} else {
-					if (result.data.type !== "undefined") {
-						reply = (result.data.obvioustype ? "" :
-							"("+result.data.type+") ") + result.result;
-					} else {
-						reply = "undefined";
-					}
-				}
-			
-				if (Array.isArray(result.data.console) && result.data.console.length) {
-					// Add console log output
-					reply += "; Console: "+result.data.console.join(", ");
-				}
-
-				context.channel.send_reply(context.intent, reply, {truncate: true});
-			} catch (e) {
-				context.channel.send_reply(
-					context.intent, "Unforeseen Error: "+e.name+": "+e.message);
-			}
-		}, this);
-	},
-	
 	learn: function(context, text) {
 		try {
 			if (context.sender.name !== 'emerson') {
@@ -177,7 +103,7 @@ var Shared = module.exports = {
 	forget: function(context, text) {
 		try {
 			if (context.sender.name !== 'emerson') {
-				context.channel.send_reply(context.sender, "yea, you're not allowed to change factoids. It's not personal, I promise :) Ask emerson to add you to my list.");
+				context.channel.send_reply(context.sender, "Sorry, only certain people can change factoids. Contact emerson if you want to be able to change them.");
 				return;
 			}
 			this.factoids.forget(text, context.sender.name);
@@ -207,60 +133,16 @@ var Shared = module.exports = {
 		factoidFindHelper(this, context, text, suppressSearch);
 	},
 
-	topic: function(context, text) {
-	
-		try {
-		
-			if (text) {
-	
-				if (text === "revert") {
-					var oldtopic = context.channel.oldtopic;
-					if (oldtopic) {
-						set_topic (oldtopic);
-						return;
-					} else {
-						throw new Error("No topic to revert to.");
-					}
-				}
-				
-				try {
-					var template = this.factoids.find("topic", true);
-					var data = JSON.parse (text);
-					template = template.replace (/{([a-z]+)}/g, function (match, name) {
-						return data.hasOwnProperty(name) ? data[name] : "";
-					});
-					set_topic (template);
-				} catch (e) {
-					var regexinfo = parse_regex_literal(text);
-					var regex = regexinfo[0];
-		
-					var topic = context.channel.topic.replace(regex, regexinfo[1]);
-					if (topic === context.channel.topic) throw new Error("Nothing changed.");
-		
-					set_topic (topic.replace(/\n/g, ' '));
-					//context.channel.set_topic(topic);
-				}
-			} else {
-				context.channel.send_reply(context.intent, context.channel.topic);
-			}
-		} catch (e) {
-			context.channel.send_reply(context.sender, e);
-		}
-		
-		function set_topic (topic) {
-			context.channel.oldtopic = context.channel.topic;
-			context.client.get_user("ChanServ")
-				.send("TOPIC "+context.channel.name+" "+topic);
-		}
-	},
-
 	ping: function(context, text) {
 		context.channel.send_reply (context.sender, "Pong!");
 	},
 
-	reauthenticate: function(context, text) {
-		context.client.authenticate();
-	}
+	amibot: function(context, text) {
+		context.channel.send_reply (context.sender, "I am a bot :)");
+	},
 
-
+	opbot: function (context, text) {
+		context.channel.oldtopic = context.channel.topic;
+		context.client.get_user("ChanServ").send("OP "+context.channel.name);
+	},
 };
