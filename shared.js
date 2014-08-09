@@ -1,5 +1,4 @@
 // This is for common functions defined in many bots at once
-var Sandbox = require("./lib/sandbox");
 var FeelingLucky = require("./lib/feelinglucky");
 
 function parse_regex_literal (text) {
@@ -134,15 +133,82 @@ var Shared = module.exports = {
 	},
 
 	ping: function(context, text) {
-		context.channel.send_reply (context.sender, "Pong!");
+		context.channel.send_reply(context.sender, "Pong!");
 	},
 
 	amibot: function(context, text) {
-		context.channel.send_reply (context.sender, "I am a bot :)");
+		context.channel.send_reply(context.sender, "I am a bot :)");
 	},
 
 	opbot: function (context, text) {
-		context.channel.oldtopic = context.channel.topic;
-		context.client.get_user("ChanServ").send("OP "+context.channel.name);
+		if(context.sender.host === 'unaffiliated/emerson') {
+			context.client.get_user("ChanServ").send("OP "+context.channel.name);
+		}
+		else {
+			context.channel.send_reply(context.sender, "lol nice try :)");
+		}
+	},
+
+	deopbot: function (context, text) {
+		if (context.sender.host === 'unaffiliated/emerson') {
+			context.client.get_user("ChanServ").send("DEOP "+context.channel.name);
+		}
+		else {
+			context.channel.send_reply(context.sender, "lol nice try :)");
+		}
+	},
+
+	voicebot: function (context, text) {
+		if (context.sender.host === 'unaffiliated/emerson') {
+			context.client.get_user("ChanServ").send("VOICE "+context.channel.name);
+		}
+		else {
+			context.channel.send_reply(context.sender, "lol nice try :)");
+		}
+	},
+
+	devoicebot: function (context, text) {
+		if (context.sender.host === 'unaffiliated/emerson') {
+			context.client.get_user("ChanServ").send("DEVOICE "+context.channel.name);
+		}
+		else {
+			context.channel.send_reply(context.sender, "lol nice try :)");
+		}
+	},
+
+	quiet: function (context, text) {
+		if (context.sender.host === 'unaffiliated/emerson') {
+			context.client.get_user("ChanServ").send("QUIET "+context.channel.name+' '+text);
+		}
+		else {
+			context.channel.send_reply(context.sender, "lol nice try :)");
+		}
+	},
+
+	unquiet: function (context, text) {
+		if (context.sender.host === 'unaffiliated/emerson') {
+			context.client.get_user("ChanServ").send("UNQUIET "+context.channel.name+' '+text);
+		}
+		else {
+			context.channel.send_reply(context.sender, "lol nice try :)");
+		}
+	},
+
+	kick: function (context, text) {
+		if (context.sender.host === 'unaffiliated/emerson') {
+			context.channel.send_reply(this, "/quote kick"+' '+text);
+		}
+		else {
+			context.channel.send_reply(context.sender, "lol nice try :)");
+		}
+	},
+
+	akick: function (context, text) {
+		if (context.sender.host === 'unaffiliated/emerson') {
+			context.client.get_user("ChanServ").send("AKICK "+context.channel.name+' add '+text+ ' !T 1h bot kicked you');
+		}
+		else {
+			context.channel.send_reply(context.sender, "lol nice try :)");
+		}
 	},
 };

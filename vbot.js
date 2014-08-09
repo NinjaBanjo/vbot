@@ -3,7 +3,6 @@ var path = require('path');
 var util = require("util");
 var http = require("http");
 
-var Sandbox = require("./lib/sandbox");
 var FactoidServer = require("./lib/factoidserv");
 var FeelingLucky = require("./lib/feelinglucky");
 var CanIUseServer = require("./lib/caniuse");
@@ -13,7 +12,6 @@ var Shared = require("./shared");
 
 
 var JSBot = function(profile) {
-	this.sandbox = new Sandbox(path.join(__dirname, "vbot-utils.js"));
 	this.factoids = new FactoidServer(path.join(__dirname, "vbot-old-factoids.json"));
 	this.caniuse_server = new CanIUseServer;
 	this.executeRegex = /^((?:sm|v8|js|>>?|\|)>)([^>].*)+/;
@@ -49,8 +47,6 @@ JSBot.prototype.init = function() {
 	this.register_command("who are you?", 'are you a bot?');
 	this.register_command("bot", 'are you a bot?');
 
-	this.register_command("auth", Shared.reauthenticate);
-
 	this.register_command("learn", Shared.learn);
 
 	this.register_command("forget", Shared.forget);
@@ -58,6 +54,13 @@ JSBot.prototype.init = function() {
 	this.register_command("commands", Shared.commands);
 
 	this.register_command("op", Shared.opbot);
+	this.register_command("deop", Shared.deopbot);
+	this.register_command("voice", Shared.voicebot);
+	this.register_command("devoice", Shared.devoicebot);
+	this.register_command("quiet", Shared.quiet);
+	this.register_command("unquiet", Shared.unquiet);
+	this.register_command("kick", Shared.kick);
+	this.register_command("akick", Shared.akick);
 
 	this.on('command_not_found', this.command_not_found);
 
