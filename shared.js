@@ -50,7 +50,7 @@ var Shared = module.exports = {
 		FeelingLucky(text + " -site:w3schools.com", function(data) {
 			if (data) {
 				context.channel.send_reply (context.intent, 
-					data.title+" <"+data.url+">", {color: true});
+					data.title+" <"+data.url+">", {color: false});
 			} else {
 				context.channel.send_reply (context.sender, "No search results found.");
 			}
@@ -101,7 +101,7 @@ var Shared = module.exports = {
 	
 	forget: function(context, text) {
 		try {
-			if (context.sender.name !== 'emerson') {
+			if (context.sender.host !== 'unaffiliated/emerson') {
 				context.channel.send_reply(context.sender, "Sorry, only certain people can change factoids. Contact emerson if you want to be able to change them.");
 				return;
 			}
@@ -114,7 +114,7 @@ var Shared = module.exports = {
 
 
 	commands: function(context, text) {
-		if(context.priv){
+		if(context.priv) {
 			var commands = this.get_commands();
 			var trigger = this.__trigger;
 			context.channel.send_reply (context.intent,
@@ -137,7 +137,8 @@ var Shared = module.exports = {
 	},
 
 	amibot: function(context, text) {
-		context.channel.send_reply(context.sender, "I am a bot :)");
+		if (!context.intent) context.intent = context.sender;
+		context.channel.send_reply(context.intent, "I am a bot :)");
 	},
 
 	opbot: function (context, text) {
@@ -196,16 +197,21 @@ var Shared = module.exports = {
 
 	kick: function (context, text) {
 		if (context.sender.host === 'unaffiliated/emerson') {
-			context.channel.send_reply(this, "/quote kick"+' '+text);
+			context.client.get_user("ChanServ").send("op "+context.channel.name);
+			context.channel.kick(text);
+			context.client.get_user("ChanServ").send("deop "+context.channel.name);
 		}
 		else {
 			context.channel.send_reply(context.sender, "lol nice try :)");
 		}
 	},
 
-	akick: function (context, text) {
+	kickban: function (context, text) {
 		if (context.sender.host === 'unaffiliated/emerson') {
-			context.client.get_user("ChanServ").send("AKICK "+context.channel.name+' add '+text+ ' !T 1h bot kicked you');
+			var mask = text+"!*@*";
+			context.client.get_user("ChanServ").send("op "+context.channel.name);
+			context.channel.kickban(text, mask);
+			context.client.get_user("ChanServ").send("deop "+context.channel.name);
 		}
 		else {
 			context.channel.send_reply(context.sender, "lol nice try :)");

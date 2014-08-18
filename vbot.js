@@ -18,7 +18,7 @@ var JSBot = function(profile) {
 
 	Bot.call(this, profile);
 	this.set_log_level(this.LOG_ALL);
-	this.set_trigger("vbot");
+	this.set_trigger("emersonbot");
 };
 
 
@@ -34,9 +34,7 @@ JSBot.prototype.init = function() {
 	this.register_command("g", "google");
 
 	this.register_command("mdn", this.mdn);
-
-	this.register_command("ecma", this.ecma);
-
+	
 	this.register_command("caniuse", this.caniuse);
 	this.register_command("ciu", "caniuse");
 
@@ -60,47 +58,12 @@ JSBot.prototype.init = function() {
 	this.register_command("quiet", Shared.quiet);
 	this.register_command("unquiet", Shared.unquiet);
 	this.register_command("kick", Shared.kick);
-	this.register_command("akick", Shared.akick);
+	this.register_command("kickban", Shared.kickban);
+	
+	this.register_command("aboutme", this.aboutme);
 
 	this.on('command_not_found', this.command_not_found);
 
-	this.load_ecma_ref();
-
-};
-
-JSBot.prototype.re = function(context, msg) {
-	// Okay first we need to check for the regex literal at the end
-	// The regular expression to match a real js regex literal
-	// is too long, so we need to use a simpler one.
-	var regexmatches, regexliteral = /\/((?:[^\\\/]|\\.)*)\/([gi]*)$/;
-
-	if (regexmatches = msg.match(regexliteral)) {
-		try {
-			var regexpobj = new RegExp(regexmatches[1], regexmatches[2]);
-		} catch (e) {
-			/* We have an invalid regular expression */
-			context.channel.send_reply(context.sender, e.message);
-			return;
-		}
-
-		var texttomatch = msg.slice(0, -regexmatches[0].length).trim();
-		var result = texttomatch.match(regexpobj);
-		if (result === null) {
-			context.channel.send_reply(context.intent, "No matches found.");
-			return;
-		}
-
-		var reply = [];
-		for (var i = 0, len = result.length; i < len; i++) {
-			reply.push(typeof result[i] !== "undefined" ?
-				"'"+result[i]+"'" :
-				"[undefined]");
-		}
-
-		context.channel.send_reply(context.intent, "Matches: "+reply.join(", "), {truncate: true});
-	} else {
-		context.channel.send_reply(context.sender, this.get_command_help("re"));
-	}
 };
 
 JSBot.prototype.mdn = function(context, text, command) {
@@ -116,54 +79,8 @@ JSBot.prototype.command_not_found = function(context, text) {
 	Shared.findPlus.call(this, context, text, !context.priv);
 };
 
-JSBot.prototype.ecma = function(context, text) {
-	try {
-
-	if (typeof this.ecma_ref === "undefined") {
-		context.channel.send_reply(context.sender, "The ECMA-262 reference is not loaded.");
-		return;
-	}
-
-	text = text.toLowerCase();
-	var ref = this.ecma_ref, ch = text.charCodeAt(0);
-
-	// If text begins with a number, the search must match at the beginning of the string
-	var muststart = ch >= 48 && ch <= 57; 
-
-	for (var i = 0, len = ref.length; i < len; i++) {
-		var item = ref[i], title = item.title.toLowerCase();
-		if (muststart ? title.substring(0, text.length) === text : ~title.indexOf(text)) {
-			context.channel.send_reply(context.intent,
-				"Found: " + item.title + " <http://es5.github.io/#" + item.id + ">");
-			return;
-		}
-	}
-
-	throw new Error("Could not find text '"+text+"' in the ECMAScript 5.1 Table of Contents.");
-
-	} catch (e) { context.channel.send_reply(context.sender, e); }
-};
-
-
-JSBot.prototype.load_ecma_ref = function() {
-	var filename = path.join(__dirname, "vbot-ecma-reference.json");
-	util.puts("Loading ECMA-262 reference...");
-	var bot = this;
-	file.readFile(filename, function (err, data) {
-		if (err) util.puts(util.inspect(err));
-		try {
-			bot.ecma_ref = JSON.parse(data);
-		} catch (e) {
-			util.puts("ECMA-262 Error: "+e.name+": "+e.message);
-		}
-	});
-	if (typeof this.ecma_ref_watching === "undefined") {
-		this.ecma_ref_watching = true;
-		file.watchFile(filename, function (curr, prev) {
-			util.puts("ECMA-262 reference file has changed.");
-			bot.load_ecma_ref();
-		});
-	}
+JSBot.prototype.aboutme = function(context, text) {
+	console.log(context);
 };
 
 JSBot.prototype.caniuse = function(context, text) {
