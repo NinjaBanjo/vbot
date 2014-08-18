@@ -1,5 +1,7 @@
 // This is for common functions defined in many bots at once
 var FeelingLucky = require("./lib/feelinglucky");
+var HTMLValidator = require("./lib/htmlvalidator");
+var URLShortener = require("./lib/urlshortener");
 
 function parse_regex_literal (text) {
 	var regexparsed = text.match(/s\/((?:[^\\\/]|\\.)*)\/((?:[^\\\/]|\\.)*)\/([gi]*)$/);
@@ -54,6 +56,23 @@ var Shared = module.exports = {
 			} else {
 				context.channel.send_reply (context.sender, "No search results found.");
 			}
+		});
+	},
+
+	validate: function(context, text) {
+		HTMLValidator(text, function(data) {
+			if (data.status === 'Invalid') {
+				context.channel.send(text + " is " + data.status + " - Errors: " + data.errors + " Warnings: " + data.warnings, {color: false});
+			}
+			else if (data.status === 'Valid') {
+				context.channel.send(text + " is " + data.status, {color: false});
+			}
+		});
+	},
+
+	shorten: function(context, text) {
+		URLShortener(text, function(data) {
+			context.channel.send(text + " is now shortened to " + data.shortUrl, {color: false});
 		});
 	},
 	

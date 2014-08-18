@@ -33,6 +33,10 @@ JSBot.prototype.init = function() {
 	this.register_command("google", Shared.google);
 	this.register_command("g", "google");
 
+	this.register_command("validate", Shared.validate);
+
+	this.register_command("shorten", Shared.shorten);
+
 	this.register_command("mdn", this.mdn);
 	
 	this.register_command("caniuse", this.caniuse);
