@@ -62,7 +62,7 @@ var Shared = module.exports = {
 	validate: function(context, text) {
 		HTMLValidator(text, function(data) {
 			if (data.status === 'Invalid') {
-				context.channel.send(text + " is " + data.status + " - Errors: " + data.errors + " Warnings: " + data.warnings, {color: false});
+				context.channel.send(text + " is " + data.status + " - Errors: " + data.errors + " Warnings: " + data.warnings + " Link: " + data.shortUrl, {color: false});
 			}
 			else if (data.status === 'Valid') {
 				context.channel.send(text + " is " + data.status, {color: false});
