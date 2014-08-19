@@ -1,17 +1,7 @@
-// This is for common functions defined in many bots at once
-var FeelingLucky = require("./lib/feelinglucky");
-var HTMLValidator = require("./lib/htmlvalidator");
-var URLShortener = require("./lib/urlshortener");
-
-function parse_regex_literal (text) {
-	var regexparsed = text.match(/s\/((?:[^\\\/]|\\.)*)\/((?:[^\\\/]|\\.)*)\/([gi]*)$/);
-	if (!regexparsed) {
-		throw new SyntaxError("Syntax is `s/expression/replacetext/gi`.");
-	}
-
-	var regex = new RegExp(regexparsed[1], regexparsed[3]);
-	return [regex, regexparsed[2].replace(/\\\//g, '/')];
-}
+var FeelingLucky = require("./lib/feelinglucky"),
+	HTMLValidator = require("./lib/htmlvalidator"),
+	URLShortener = require("./lib/urlshortener"),
+	CanIUse = require("./lib/caniuse");
 
 function factoidFindHelper(bot, context, text, suppressSearch) {
 	try {
@@ -46,10 +36,31 @@ function factoidFindHelper(bot, context, text, suppressSearch) {
 	}
 }
 
-var Shared = module.exports = {
-	
+var Commands = module.exports = {
 	google: function(context, text) {
 		FeelingLucky(text + " -site:w3schools.com", function(data) {
+			if (data) {
+				context.channel.send_reply (context.intent, 
+					data.title+" <"+data.url+">", {color: false});
+			} else {
+				context.channel.send_reply (context.sender, "No search results found.");
+			}
+		});
+	},
+
+	mdn: function(context, text) {
+		FeelingLucky(text + " site:developer.mozilla.org", function(data) {
+			if (data) {
+				context.channel.send_reply (context.intent, 
+					data.title+" <"+data.url+">", {color: false});
+			} else {
+				context.channel.send_reply (context.sender, "No search results found.");
+			}
+		});
+	},
+
+	wpd: function(context, text) {
+		FeelingLucky(text + " site:docs.webplatform.org", function(data) {
 			if (data) {
 				context.channel.send_reply (context.intent, 
 					data.title+" <"+data.url+">", {color: false});
@@ -73,6 +84,12 @@ var Shared = module.exports = {
 	shorten: function(context, text) {
 		URLShortener(text, function(data) {
 			context.channel.send(text + " is now shortened to " + data.shortUrl, {color: false});
+		});
+	},
+
+	caniuse: function(context, text) {
+		CanIUse(text, function(data) {
+			context.channel.send_reply(context.intent, "link for " + text + " is " + data);
 		});
 	},
 	
@@ -155,41 +172,41 @@ var Shared = module.exports = {
 		context.channel.send_reply(context.sender, "Pong!");
 	},
 
-	amibot: function(context, text) {
+	iambot: function(context, text) {
 		if (!context.intent) context.intent = context.sender;
 		context.channel.send_reply(context.intent, "I am a bot :)");
 	},
 
-	opbot: function (context, text) {
+	op: function (context, text) {
 		if(context.sender.host === 'unaffiliated/emerson') {
-			context.client.get_user("ChanServ").send("OP "+context.channel.name);
+			context.client.get_user("ChanServ").send("OP " + context.channel.name + " " + text);
 		}
 		else {
 			context.channel.send_reply(context.sender, "lol nice try :)");
 		}
 	},
 
-	deopbot: function (context, text) {
+	deop: function (context, text) {
 		if (context.sender.host === 'unaffiliated/emerson') {
-			context.client.get_user("ChanServ").send("DEOP "+context.channel.name);
+			context.client.get_user("ChanServ").send("DEOP " + context.channel.name + " " + text);
 		}
 		else {
 			context.channel.send_reply(context.sender, "lol nice try :)");
 		}
 	},
 
-	voicebot: function (context, text) {
+	voice: function (context, text) {
 		if (context.sender.host === 'unaffiliated/emerson') {
-			context.client.get_user("ChanServ").send("VOICE "+context.channel.name);
+			context.client.get_user("ChanServ").send("VOICE "+ context.channel.name + " " + text);
 		}
 		else {
 			context.channel.send_reply(context.sender, "lol nice try :)");
 		}
 	},
 
-	devoicebot: function (context, text) {
+	devoice: function (context, text) {
 		if (context.sender.host === 'unaffiliated/emerson') {
-			context.client.get_user("ChanServ").send("DEVOICE "+context.channel.name);
+			context.client.get_user("ChanServ").send("DEVOICE " + context.channel.name + " " + text);
 		}
 		else {
 			context.channel.send_reply(context.sender, "lol nice try :)");
@@ -198,7 +215,7 @@ var Shared = module.exports = {
 
 	quiet: function (context, text) {
 		if (context.sender.host === 'unaffiliated/emerson') {
-			context.client.get_user("ChanServ").send("QUIET "+context.channel.name+' '+text);
+			context.client.get_user("ChanServ").send("QUIET " + context.channel.name + " "+ text);
 		}
 		else {
 			context.channel.send_reply(context.sender, "lol nice try :)");
@@ -207,7 +224,7 @@ var Shared = module.exports = {
 
 	unquiet: function (context, text) {
 		if (context.sender.host === 'unaffiliated/emerson') {
-			context.client.get_user("ChanServ").send("UNQUIET "+context.channel.name+' '+text);
+			context.client.get_user("ChanServ").send("UNQUIET "+ context.channel.name + " " + text);
 		}
 		else {
 			context.channel.send_reply(context.sender, "lol nice try :)");
@@ -216,9 +233,9 @@ var Shared = module.exports = {
 
 	kick: function (context, text) {
 		if (context.sender.host === 'unaffiliated/emerson') {
-			context.client.get_user("ChanServ").send("op "+context.channel.name);
+			context.client.get_user("ChanServ").send("op " + context.channel.name);
 			context.channel.kick(text);
-			context.client.get_user("ChanServ").send("deop "+context.channel.name);
+			context.client.get_user("ChanServ").send("deop " + context.channel.name);
 		}
 		else {
 			context.channel.send_reply(context.sender, "lol nice try :)");
@@ -228,9 +245,9 @@ var Shared = module.exports = {
 	kickban: function (context, text) {
 		if (context.sender.host === 'unaffiliated/emerson') {
 			var mask = text+"!*@*";
-			context.client.get_user("ChanServ").send("op "+context.channel.name);
+			context.client.get_user("ChanServ").send("op " + context.channel.name);
 			context.channel.kickban(text, mask);
-			context.client.get_user("ChanServ").send("deop "+context.channel.name);
+			context.client.get_user("ChanServ").send("deop " + context.channel.name);
 		}
 		else {
 			context.channel.send_reply(context.sender, "lol nice try :)");
