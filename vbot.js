@@ -1,10 +1,14 @@
 var util = require("util");
+var path = require("path");
 
 var Bot = require("./lib/irc");
 var Commands = require("./commands");
 
+var FactoidServer = require("./lib/factoidserv");
+
 
 var JSBot = function(profile) {
+	this.factoids = new FactoidServer(path.join(__dirname, "vbot-old-factoids.json"));
 	Bot.call(this, profile);
 	this.set_log_level(this.LOG_ALL);
 	this.set_trigger(".");
@@ -18,6 +22,7 @@ JSBot.prototype.init = function() {
 	Bot.prototype.init.call(this);
 
 	this.register_command("google", Commands.google);
+	this.register_command("factoid", Commands.factoid);
 
 	this.register_command("validate", Commands.validate);
 
@@ -28,6 +33,8 @@ JSBot.prototype.init = function() {
 	this.register_command("wpd", Commands.wpd);
 	
 	this.register_command("ciu", Commands.caniuse);
+	this.register_command("tell", Commands.tell);
+	this.register_command("msg", Commands.msg);
 
 	this.register_command("ping", Commands.ping);
 	this.register_command("bot", Commands.iambot);
@@ -44,6 +51,7 @@ JSBot.prototype.init = function() {
 	this.register_command("unquiet", Commands.unquiet);
 	this.register_command("kick", Commands.kick);
 	this.register_command("kickban", Commands.kickban);
+	this.register_command("whois", Commands.whois);
 };
 
 var profile = require("./vbot-profile.js");

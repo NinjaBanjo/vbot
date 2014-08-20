@@ -37,6 +37,9 @@ function factoidFindHelper(bot, context, text, suppressSearch) {
 }
 
 var Commands = module.exports = {
+	factoid: function(context, text) {
+		context.channel.send_reply(context.sender, text);
+	},
 	google: function(context, text) {
 		FeelingLucky(text + " -site:w3schools.com", function(data) {
 			if (data) {
@@ -132,6 +135,7 @@ var Commands = module.exports = {
 
 		} catch (e) {
 			context.channel.send_reply(context.sender, e);
+			console.log(e);
 		}
 	},
 	
@@ -146,6 +150,18 @@ var Commands = module.exports = {
 		} catch(e) {
 			context.channel.send_reply(context.sender, e);
 		}
+	},
+
+	factoid: function(context, text) {
+		context.channel.send_reply(context.sender, text);
+	},
+
+	tell: function(context, text) {
+		context.channel.send_reply(context.intent, text);
+	},
+
+	msg: function(context, text) {
+		context.channel.get_user(intent).send(text);
 	},
 
 
@@ -248,6 +264,15 @@ var Commands = module.exports = {
 			context.client.get_user("ChanServ").send("op " + context.channel.name);
 			context.channel.kickban(text, mask);
 			context.client.get_user("ChanServ").send("deop " + context.channel.name);
+		}
+		else {
+			context.channel.send_reply(context.sender, "lol nice try :)");
+		}
+	},
+
+	whois: function (context, text) {
+		if (context.sender.host === 'unaffiliated/emerson') {
+			context.channel.whois(text);
 		}
 		else {
 			context.channel.send_reply(context.sender, "lol nice try :)");
