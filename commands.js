@@ -1,7 +1,6 @@
 var FeelingLucky = require("./lib/feelinglucky"),
 	HTMLValidator = require("./lib/htmlvalidator"),
-	URLShortener = require("./lib/urlshortener"),
-	CanIUse = require("./lib/caniuse");
+	URLShortener = require("./lib/urlshortener");
 
 function factoidFindHelper(bot, context, text, suppressSearch) {
 	try {
@@ -38,7 +37,7 @@ function factoidFindHelper(bot, context, text, suppressSearch) {
 
 var Commands = module.exports = {
 	factoid: function(context, text) {
-		context.channel.send_reply(context.sender, text);
+		context.channel.send_reply(context.sender.name, text);
 	},
 	google: function(context, text) {
 		FeelingLucky(text + " -site:w3schools.com", function(data) {
@@ -46,7 +45,7 @@ var Commands = module.exports = {
 				context.channel.send_reply (context.intent, 
 					data.title+" <"+data.url+">", {color: false});
 			} else {
-				context.channel.send_reply (context.sender, "No search results found.");
+				context.channel.send_reply (context.sender.name, "No search results found.");
 			}
 		});
 	},
@@ -57,7 +56,7 @@ var Commands = module.exports = {
 				context.channel.send_reply (context.intent, 
 					data.title+" <"+data.url+">", {color: false});
 			} else {
-				context.channel.send_reply (context.sender, "No search results found.");
+				context.channel.send_reply (context.sender.name, "No search results found.");
 			}
 		});
 	},
@@ -68,7 +67,7 @@ var Commands = module.exports = {
 				context.channel.send_reply (context.intent, 
 					data.title+" <"+data.url+">", {color: false});
 			} else {
-				context.channel.send_reply (context.sender, "No search results found.");
+				context.channel.send_reply(context.sender.name, "No search results found.");
 			}
 		});
 	},
@@ -76,30 +75,29 @@ var Commands = module.exports = {
 	validate: function(context, text) {
 		HTMLValidator(text, function(data) {
 			if (data.status === 'Invalid') {
-				context.channel.send(text + " is " + data.status + " - Errors: " + data.errors + " Warnings: " + data.warnings + " Link: " + data.shortUrl, {color: false});
+				context.channel.send_reply(context.intent, text + " is " + data.status + " - Errors: " + data.errors + " Warnings: " + data.warnings + " Link: " + data.shortUrl);
 			}
 			else if (data.status === 'Valid') {
-				context.channel.send(text + " is " + data.status, {color: false});
+				context.channel.send_reply(context.intent, text + " is " + data.status);
 			}
 		});
 	},
 
 	shorten: function(context, text) {
 		URLShortener(text, function(data) {
-			context.channel.send(text + " is now shortened to " + data.shortUrl, {color: false});
+			context.channel.send_reply(context.intent, text + " is now shortened to " + data.shortUrl, {color: false});
 		});
 	},
 
 	caniuse: function(context, text) {
-		CanIUse(text, function(data) {
-			context.channel.send_reply(context.intent, "link for " + text + " is " + data);
-		});
+		var ciudata = this.caniuse_server.search(text);
+		context.channel.send_reply(context.intent, ciudata);
 	},
 	
 	learn: function(context, text) {
 		try {
-			if (context.sender.name !== 'emerson') {
-				context.channel.send_reply(context.sender, "Sorry, only certain people can change factoids. Contact emerson if you want to be able to change them.");
+			if (context.sender.host !== 'unaffiliated/emerson') {
+				context.channel.send_reply(context.sender.name, "Sorry, only certain people can change factoids. Contact emerson if you want to be able to change them.");
 				return;
 			}
 			var parsed = text.match(/^(alias)?\s*("[^"]*"|.+?)\s*(=~?)\s*(.+)$/i);
@@ -119,7 +117,7 @@ var Commands = module.exports = {
 
 			if (alias) {
 				var key = this.factoids.alias(factoid, value, context.sender.name);
-				context.channel.send_reply(context.sender,
+				context.channel.send_reply(context.sender.name,
 					"Learned `"+factoid+"` => `"+key+"`.");
 				return;
 			}
@@ -127,14 +125,12 @@ var Commands = module.exports = {
 			/* Setting the text of a factoid */ 
 			if (operation === "=") {
 				this.factoids.learn(factoid, value, context.sender.name);
-				context.channel.send_reply(context.sender, "Learned `"+factoid+"`.");
+				context.channel.send_reply(context.sender.name, "Learned `"+factoid+"`.");
 				return;
-
-			/* Replacing the text of a factoid based on regular expression */
 			}
 
-		} catch (e) {
-			context.channel.send_reply(context.sender, e);
+		} 
+		catch (e) {
 			console.log(e);
 		}
 	},
@@ -142,18 +138,19 @@ var Commands = module.exports = {
 	forget: function(context, text) {
 		try {
 			if (context.sender.host !== 'unaffiliated/emerson') {
-				context.channel.send_reply(context.sender, "Sorry, only certain people can change factoids. Contact emerson if you want to be able to change them.");
+				context.channel.send_reply(context.sender.name, "Sorry, only certain people can change factoids. Contact emerson if you want to be able to change them.");
 				return;
 			}
 			this.factoids.forget(text, context.sender.name);
-			context.channel.send_reply(context.sender, "I don't know anything about '"+text+"' anymore.");
-		} catch(e) {
-			context.channel.send_reply(context.sender, e);
+			context.channel.send_reply(context.sender.name, "I don't know anything about '"+text+"' anymore.");
+		} 
+		catch(e) {
+			console.log(e);
 		}
 	},
 
 	factoid: function(context, text) {
-		context.channel.send_reply(context.sender, text);
+		context.channel.send_reply(context.intent, text);
 	},
 
 	tell: function(context, text) {
@@ -161,10 +158,9 @@ var Commands = module.exports = {
 	},
 
 	msg: function(context, text) {
-		context.channel.get_user(intent).send(text);
+		context.client.get_user(context.intent).send(text);
 	},
-
-
+	
 	commands: function(context, text) {
 		if(context.priv) {
 			var commands = this.get_commands();
@@ -185,11 +181,10 @@ var Commands = module.exports = {
 	},
 
 	ping: function(context, text) {
-		context.channel.send_reply(context.sender, "Pong!");
+		context.channel.send_reply(context.intent, "Pong!");
 	},
 
 	iambot: function(context, text) {
-		if (!context.intent) context.intent = context.sender;
 		context.channel.send_reply(context.intent, "I am a bot :)");
 	},
 
@@ -198,7 +193,7 @@ var Commands = module.exports = {
 			context.client.get_user("ChanServ").send("OP " + context.channel.name + " " + text);
 		}
 		else {
-			context.channel.send_reply(context.sender, "lol nice try :)");
+			context.channel.send_reply(context.sender.name, "lol nice try :)");
 		}
 	},
 
@@ -207,7 +202,7 @@ var Commands = module.exports = {
 			context.client.get_user("ChanServ").send("DEOP " + context.channel.name + " " + text);
 		}
 		else {
-			context.channel.send_reply(context.sender, "lol nice try :)");
+			context.channel.send_reply(context.sender.name, "lol nice try :)");
 		}
 	},
 
@@ -216,7 +211,7 @@ var Commands = module.exports = {
 			context.client.get_user("ChanServ").send("VOICE "+ context.channel.name + " " + text);
 		}
 		else {
-			context.channel.send_reply(context.sender, "lol nice try :)");
+			context.channel.send_reply(context.sender.name, "lol nice try :)");
 		}
 	},
 
@@ -225,7 +220,7 @@ var Commands = module.exports = {
 			context.client.get_user("ChanServ").send("DEVOICE " + context.channel.name + " " + text);
 		}
 		else {
-			context.channel.send_reply(context.sender, "lol nice try :)");
+			context.channel.send_reply(context.sender.name, "lol nice try :)");
 		}
 	},
 
@@ -234,7 +229,7 @@ var Commands = module.exports = {
 			context.client.get_user("ChanServ").send("QUIET " + context.channel.name + " "+ text);
 		}
 		else {
-			context.channel.send_reply(context.sender, "lol nice try :)");
+			context.channel.send_reply(context.sender.name, "lol nice try :)");
 		}
 	},
 
@@ -243,7 +238,7 @@ var Commands = module.exports = {
 			context.client.get_user("ChanServ").send("UNQUIET "+ context.channel.name + " " + text);
 		}
 		else {
-			context.channel.send_reply(context.sender, "lol nice try :)");
+			context.channel.send_reply(context.sender.name, "lol nice try :)");
 		}
 	},
 
@@ -254,7 +249,7 @@ var Commands = module.exports = {
 			context.client.get_user("ChanServ").send("deop " + context.channel.name);
 		}
 		else {
-			context.channel.send_reply(context.sender, "lol nice try :)");
+			context.channel.send_reply(context.sender.name, "lol nice try :)");
 		}
 	},
 
@@ -266,7 +261,7 @@ var Commands = module.exports = {
 			context.client.get_user("ChanServ").send("deop " + context.channel.name);
 		}
 		else {
-			context.channel.send_reply(context.sender, "lol nice try :)");
+			context.channel.send_reply(context.sender.name, "lol nice try :)");
 		}
 	},
 
@@ -275,7 +270,7 @@ var Commands = module.exports = {
 			context.channel.whois(text);
 		}
 		else {
-			context.channel.send_reply(context.sender, "lol nice try :)");
+			context.channel.send_reply(context.sender.name, "lol nice try :)");
 		}
 	},
 };
