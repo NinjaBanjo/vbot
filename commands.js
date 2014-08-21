@@ -265,6 +265,15 @@ var Commands = module.exports = {
 		}
 	},
 
+	join: function (context, text) {
+		if (context.sender.host === 'unaffiliated/emerson') {
+			context.channel.join_on_invite(text);
+		}
+		else {
+			context.channel.send_reply(context.sender.name, "lol nice try :)");
+		}
+	},
+
 	whois: function (context, text) {
 		if (context.sender.host === 'unaffiliated/emerson') {
 			context.channel.whois(text);
