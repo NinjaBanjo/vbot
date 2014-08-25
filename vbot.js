@@ -48,10 +48,12 @@ JSBot.prototype.init = function() {
 	this.register_command("caniuse", Commands.caniuse);
 	this.register_command("ciu", "caniuse");
 
+	//Returns a link to the WHATWG HTML LS definition for an element
+	this.register_command("whatwg", Commands.whatwg);
+
 	// Info/giving factoids
 	this.register_command("tell", Commands.tell, false);
 	this.register_command("msg", Commands.msg, false);
-	// this.register_command("notice", Commands.notice, false);
 
 	this.register_command("ping", Commands.ping);
 	this.register_command("bot", Commands.iambot);

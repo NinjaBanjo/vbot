@@ -48,21 +48,13 @@ A profile is an array of objects. Each object has the properties:
 ### bot.init()
 Goes through each server in the profile and begins connecting and registering event listeners.
 
-### bot.register_listener(regex, callback)
-Adds a regular expression listeners to incoming traffic on all servers. When the messages match, callback is called with the arguments:
 
-* context: A context object
-* text: The full message
-* 1st subpattern
-* 2nd subpattern
-* ...
-
-### bot.register_command(command, callback)
+### bot.register_command(command, callback, [pm])
 Adds a command.
 
 * command: A string value for the command
 * callback: A function to call when the command is run
-* options: An object with the keys: allow_intentions and hidden.
+* pm: Optional boolean value for if the command is allowed in pm's with the bot. Default is true, false disallows use in pm's.
 
 When the command is called, the callback is called with the arguments:
 

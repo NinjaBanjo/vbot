@@ -93,6 +93,11 @@ var Commands = module.exports = {
 		var ciudata = this.caniuse_server.search(text);
 		context.channel.send_reply(context.intent, ciudata);
 	},
+
+	whatwg: function(context, text) {
+		var url = "http://www.whatwg.org/specs/web-apps/current-work/multipage/semantics.html#the-" + text + "-element";
+		context.channel.send_reply(context.intent, url);
+	},
 	
 	learn: function(context, text) {
 		try {
@@ -154,21 +159,33 @@ var Commands = module.exports = {
 	},
 
 	tell: function(context, text) {
-		context.channel.send_reply(context.intent, text);
+		var factoid_value = this.factoids.find(text);
+		if (factoid_value) {
+			context.channel.send_reply(context.intent, factoid_value);
+		}
+		else {
+			context.channel.send_reply(context.sender.name, "Hmm, I don't know what " + text + " is :/");
+		}
 	},
 
 	msg: function(context, text) {
-		context.client.get_user(context.intent).send(text);
+		var factoid_value = this.factoids.find(text);
+		if (factoid_value) {
+			context.client.get_user(context.intent).send(text);
+		}
+		else {
+			context.channel.send_reply(context.sender.name, "Hmm, I don't know what " + text + " is :/");
+		}
 	},
 	
 	commands: function(context, text) {
 		if(context.priv) {
 			var commands = this.get_commands();
 			var trigger = this.__trigger;
-			context.channel.send_reply (context.intent,
+			context.channel.send_reply(context.intent,
 				"Valid commands are: " + trigger + commands.join(", " + trigger));
 		}
-		else context.channel.send_reply (context.intent,
+		else context.channel.send_reply(context.intent,
 				"Output too noisy. PM me for this one.");
 	},
 
@@ -189,11 +206,8 @@ var Commands = module.exports = {
 	},
 
 	op: function (context, text) {
-		if(context.sender.host === 'unaffiliated/emerson') {
+		if (context.sender.host === 'unaffiliated/emerson') {
 			context.client.get_user("ChanServ").send("OP " + context.channel.name + " " + text);
-		}
-		else {
-			context.channel.send_reply(context.sender.name, "lol nice try :)");
 		}
 	},
 
@@ -201,17 +215,11 @@ var Commands = module.exports = {
 		if (context.sender.host === 'unaffiliated/emerson') {
 			context.client.get_user("ChanServ").send("DEOP " + context.channel.name + " " + text);
 		}
-		else {
-			context.channel.send_reply(context.sender.name, "lol nice try :)");
-		}
 	},
 
 	voice: function (context, text) {
 		if (context.sender.host === 'unaffiliated/emerson') {
 			context.client.get_user("ChanServ").send("VOICE "+ context.channel.name + " " + text);
-		}
-		else {
-			context.channel.send_reply(context.sender.name, "lol nice try :)");
 		}
 	},
 
@@ -219,26 +227,17 @@ var Commands = module.exports = {
 		if (context.sender.host === 'unaffiliated/emerson') {
 			context.client.get_user("ChanServ").send("DEVOICE " + context.channel.name + " " + text);
 		}
-		else {
-			context.channel.send_reply(context.sender.name, "lol nice try :)");
-		}
 	},
 
 	quiet: function (context, text) {
 		if (context.sender.host === 'unaffiliated/emerson') {
 			context.client.get_user("ChanServ").send("QUIET " + context.channel.name + " "+ text);
 		}
-		else {
-			context.channel.send_reply(context.sender.name, "lol nice try :)");
-		}
 	},
 
 	unquiet: function (context, text) {
 		if (context.sender.host === 'unaffiliated/emerson') {
 			context.client.get_user("ChanServ").send("UNQUIET "+ context.channel.name + " " + text);
-		}
-		else {
-			context.channel.send_reply(context.sender.name, "lol nice try :)");
 		}
 	},
 
@@ -247,9 +246,6 @@ var Commands = module.exports = {
 			context.client.get_user("ChanServ").send("op " + context.channel.name);
 			context.channel.kick(text);
 			context.client.get_user("ChanServ").send("deop " + context.channel.name);
-		}
-		else {
-			context.channel.send_reply(context.sender.name, "lol nice try :)");
 		}
 	},
 
@@ -260,26 +256,17 @@ var Commands = module.exports = {
 			context.channel.kickban(text, mask);
 			context.client.get_user("ChanServ").send("deop " + context.channel.name);
 		}
-		else {
-			context.channel.send_reply(context.sender.name, "lol nice try :)");
-		}
 	},
 
 	join: function (context, text) {
 		if (context.sender.host === 'unaffiliated/emerson') {
 			context.channel.join_on_invite(text);
 		}
-		else {
-			context.channel.send_reply(context.sender.name, "lol nice try :)");
-		}
 	},
 
 	whois: function (context, text) {
 		if (context.sender.host === 'unaffiliated/emerson') {
 			context.channel.whois(text);
-		}
-		else {
-			context.channel.send_reply(context.sender.name, "lol nice try :)");
 		}
 	},
 };
