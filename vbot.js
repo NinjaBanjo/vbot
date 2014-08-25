@@ -74,6 +74,9 @@ JSBot.prototype.init = function() {
 	this.register_command("kickban", Commands.kickban, false);
 	this.register_command("whois", Commands.whois);
 	this.register_command("join", Commands.join);
+
+	//PhantomJS stuff
+	this.register_command('screenshot', Commands.screenshot);
 };
 
 var profile = require("./vbot-profile.js");

@@ -1,5 +1,6 @@
 var FeelingLucky = require("./lib/feelinglucky"),
 	HTMLValidator = require("./lib/htmlvalidator"),
+	PhantomJS = require('./lib/phantomjs'),
 	URLShortener = require("./lib/urlshortener");
 
 function factoidFindHelper(bot, context, text, suppressSearch) {
@@ -269,4 +270,10 @@ var Commands = module.exports = {
 			context.channel.whois(text);
 		}
 	},
+
+	screenshot: function(context, text) {
+		PhantomJS.screenshot(text, function(data) {
+			context.channel.send_reply(context.intent, "Screenshot at " + data.location);
+		});
+	}
 };
