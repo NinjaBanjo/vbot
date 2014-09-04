@@ -1,7 +1,7 @@
 vbot
 ========
 
-This is vbot, a Node.js IRC bot for web developers. 
+This is vbot, a Node.js IRC bot for web developers. See wiki for list of commands and stuff.
 
 
 Features
