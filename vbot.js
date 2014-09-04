@@ -25,18 +25,18 @@ JSBot.prototype.init = function() {
 
 	//Technically it's more of a lucky search, only returns one result
 	this.register_command("google", Commands.google);
-	this.register_command("g", "google");
+	this.register_command(".g", "google");
 
 	// Never called directly, just an interface for factoids
 	this.register_command("factoid", Commands.factoid);
 
 	//Only HTML Validator right now, CSS (and maybe JS) coming soon
 	this.register_command("validate", Commands.validate);
-	this.register_command("v", "validate");
+	this.register_command(".v", "validate");
 
 	//Goo.gl shortener
 	this.register_command("shorten", Commands.shorten);
-	this.register_command("s", "shorten");
+	this.register_command(".s", "shorten");
 
 	//Search MDN docs
 	this.register_command("mdn", Commands.mdn);
@@ -50,6 +50,9 @@ JSBot.prototype.init = function() {
 
 	//Returns a link to the WHATWG HTML LS definition for an element
 	this.register_command("whatwg", Commands.whatwg);
+
+	this.register_command("lmgtfy", Commands.lmgtfy);
+	this.register_command(".l", "lmgtfy");
 
 	// Info/giving factoids
 	this.register_command("tell", Commands.tell, false);

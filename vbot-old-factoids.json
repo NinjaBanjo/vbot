@@ -29,7 +29,7 @@
 		},
 		"paste": {
 			"value": "Paste links, not code. Sites like http://jsbin.com/, http://jsfiddle.net/, and http://www.webdevout.net/test let people easily run your code, but can be slow. Please do not use http://pastebin.com, the reasons are many.",
-			"popularity": 398,
+			"popularity": 399,
 			"editors": [
 				"niggler",
 				"gkatsev",
@@ -148,7 +148,7 @@
 		},
 		"tias": {
 			"value": "Try it and see, why dontcha?",
-			"popularity": 65
+			"popularity": 66
 		},
 		"css": {
 			"value": "Use Javascript to manipulate CSS stylesheets in a page. http://www.quirksmode.org/dom/w3c_css.html For other CSS problems, please try the #css channel.",
@@ -156,7 +156,7 @@
 		},
 		"recursion": {
 			"value": "Ask me about recursion",
-			"popularity": 18
+			"popularity": 19
 		},
 		"ask": {
 			"value": "Don't ask to ask, or if anyone is here or alive or uses something. Just ask your question. http://www.mikeash.com/getting_answers.html http://www.catb.org/esr/faqs/smart-questions.html http://guipn.com/how-to-get-helpful-help.htm",
@@ -1446,6 +1446,17 @@
 			"value": "http://www.w3.org/TR/html5/",
 			"date": "2014-08-20T15:01:04.141Z",
 			"popularity": 14
+		},
+		"what is emerson?": {
+			"value": "awesome",
+			"date": "2014-09-04T02:25:18.229Z",
+			"popularity": 0
+		},
+		"what emerson is": {
+			"alias": "what is emerson?",
+			"creator": "emerson",
+			"date": "2014-09-04T02:26:48.193Z",
+			"popularity": 0
 		}
 	},
 	"delete_log": [

@@ -99,13 +99,14 @@ var Commands = module.exports = {
 		var url = "http://www.whatwg.org/specs/web-apps/current-work/multipage/semantics.html#the-" + text + "-element";
 		context.channel.send_reply(context.intent, url);
 	},
+
+	lmgtfy: function(context, text) {
+		var url = "http://lmgtfy.com/?q=" + text;
+		context.channel.send_reply(context.intent, url);
+	},
 	
 	learn: function(context, text) {
 		try {
-			if (context.sender.host !== 'unaffiliated/emerson') {
-				context.channel.send_reply(context.sender.name, "Sorry, only certain people can change factoids. Contact emerson if you want to be able to change them.");
-				return;
-			}
 			var parsed = text.match(/^(alias)?\s*("[^"]*"|.+?)\s*(=~?)\s*(.+)$/i);
 			if (!parsed) {
 				throw new SyntaxError(
