@@ -104,6 +104,10 @@ var Commands = module.exports = {
 		var url = "http://lmgtfy.com/?q=" + text;
 		context.channel.send_reply(context.intent, url);
 	},
+
+	addkarma: function(context, text) {
+		this.karma.addOne(text);
+	},
 	
 	learn: function(context, text) {
 		try {
@@ -251,15 +255,6 @@ var Commands = module.exports = {
 		}
 	},
 
-	kickban: function (context, text) {
-		if (context.sender.host === 'unaffiliated/emerson') {
-			var mask = text+"!*@*";
-			context.client.get_user("ChanServ").send("op " + context.channel.name);
-			context.channel.kickban(text, mask);
-			context.client.get_user("ChanServ").send("deop " + context.channel.name);
-		}
-	},
-
 	join: function (context, text) {
 		if (context.sender.host === 'unaffiliated/emerson') {
 			context.channel.join_on_invite(text);
@@ -276,5 +271,16 @@ var Commands = module.exports = {
 		PhantomJS.screenshot(text, function(data) {
 			context.channel.send_reply(context.intent, "Screenshot at " + data.location);
 		});
+	},
+
+	build: function(context, text) {
+		this.travis_bot.get_build_status(text, function(output) {
+			context.channel.send_reply(context.intent, "Build #" + output.number + " is " + output.state + ". URL: " + output.url);
+		});
+	},
+
+	restart: function(context, text) {
+		var output = this.travis_bot.restart_build(text);
+		context.channel.send_reply(context.intent, "Restarted build.");
 	}
 };

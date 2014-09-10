@@ -6,14 +6,15 @@ var Commands = require("./commands");
 
 var FactoidServer = require("./lib/factoidserv");
 var CanIUseServer = require("./lib/caniuse");
+var TravisServer = require('./lib/travis');
 
 
 var JSBot = function(profile) {
 	this.factoids = new FactoidServer(path.join(__dirname, "vbot-old-factoids.json"));
 	this.caniuse_server = new CanIUseServer;
+	this.travis_bot = new TravisServer(profile[0].repo_owner, profile[0].repo_name, profile[0].travis_auth);
 	Bot.call(this, profile);
 	this.set_log_level(this.LOG_ALL);
-	this.set_trigger(".");
 };
 
 
@@ -74,12 +75,15 @@ JSBot.prototype.init = function() {
 	this.register_command("quiet", Commands.quiet, false);
 	this.register_command("unquiet", Commands.unquiet, false);
 	this.register_command("kick", Commands.kick, false);
-	this.register_command("kickban", Commands.kickban, false);
 	this.register_command("whois", Commands.whois);
 	this.register_command("join", Commands.join);
 
 	//PhantomJS stuff
 	this.register_command('screenshot', Commands.screenshot);
+
+	//Travis CI stuff
+	this.register_command('build', Commands.build);
+	this.register_command('restart', Commands.restart);
 };
 
 var profile = require("./vbot-profile.js");
