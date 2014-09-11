@@ -282,5 +282,9 @@ var Commands = module.exports = {
 	restart: function(context, text) {
 		var output = this.travis_bot.restart_build(text);
 		context.channel.send_reply(context.intent, "Restarted build.");
+	},
+
+	webhook_travis: function(context, text) {
+
 	}
 };
