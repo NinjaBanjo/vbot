@@ -7,10 +7,12 @@ var Commands = require("./commands");
 var FactoidServer = require("./lib/factoidserv");
 var CanIUseServer = require("./lib/caniuse");
 var TravisServer = require('./lib/travis');
+var QuoteServer = require('./lib/quoteserv');
 
 
 var JSBot = function(profile) {
 	this.factoids = new FactoidServer(path.join(__dirname, "vbot-old-factoids.json"));
+	this.quotes = new QuoteServer(path.join(__dirname, "quotes.json"));
 	this.caniuse_server = new CanIUseServer;
 	this.travis_bot = new TravisServer(profile[0].repo_owner, profile[0].repo_name, profile[0].travis_auth);
 	Bot.call(this, profile);
@@ -30,6 +32,8 @@ JSBot.prototype.init = function() {
 
 	// Never called directly, just an interface for factoids
 	this.register_command("factoid", Commands.factoid);
+	
+	this.register_command("quote", Commands.quote);
 
 	//Only HTML Validator right now, CSS (and maybe JS) coming soon
 	this.register_command("validate", Commands.validate);

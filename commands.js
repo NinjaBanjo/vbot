@@ -164,6 +164,17 @@ var Commands = module.exports = {
 		context.channel.send_reply(context.intent, text);
 	},
 
+	quote: function(context, text) {
+		var quote = text.match(/^([A-Za-z0-9_-]+)\s?(.*)?$/);
+		if (quote[2]) {
+			this.quotes.save(quote[1], quote[2]);
+			context.channel.send("Saved quote from " + quote[1]);
+		}
+		else {
+			context.channel.send(quote[1] + " said: '" + this.quotes.random(quote[1]) + "'");
+		}
+	},
+
 	tell: function(context, text) {
 		var factoid_value = this.factoids.find(text);
 		if (factoid_value) {
@@ -282,9 +293,5 @@ var Commands = module.exports = {
 	restart: function(context, text) {
 		var output = this.travis_bot.restart_build(text);
 		context.channel.send_reply(context.intent, "Restarted build.");
-	},
-
-	webhook_travis: function(context, text) {
-
 	}
 };
