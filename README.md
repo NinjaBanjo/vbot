@@ -70,8 +70,9 @@ This bot AND/OR bot library is still being developed, but those are some of the 
 Sample Profile
 ---
 
-Copy this to 
+Copy this to vbot-profile.js:
 
+```
 module.exports = [{
 	host: 'chat.freenode.net',
 	port: 6667,
@@ -85,4 +86,4 @@ module.exports = [{
 		'#whatever'
 	]
 }];
-
+```
