@@ -1,94 +1,107 @@
-var util = require("util");
-var path = require("path");
+var net = require("net");
+var fs = require("fs");
 
-var Bot = require("./lib/irc");
-var Commands = require("./commands");
+var Bot = module.exports = function(profile) {
+    this.port = profile.port;
+    this.host = profile.host;
+    this.buffer = '';
 
-var FactoidServer = require("./lib/factoidserv");
-var CanIUseServer = require("./lib/caniuse");
-var TravisServer = require('./lib/travis');
-var QuoteServer = require('./lib/quoteserv');
+    this.nick = profile.nick;
+    this.user = profile.user;
+    this.real = profile.real;
 
+    this.channels = profile.channels;
 
-var JSBot = function(profile) {
-	this.factoids = new FactoidServer(path.join(__dirname, "vbot-old-factoids.json"));
-	this.quotes = new QuoteServer(path.join(__dirname, "quotes.json"));
-	this.caniuse_server = new CanIUseServer;
-	this.travis_bot = new TravisServer(profile[0].repo_owner, profile[0].repo_name, profile[0].travis_auth);
-	Bot.call(this, profile);
-	this.set_log_level(this.LOG_ALL);
+    this.logfile = profile.logfile;
+    this.nicklog = {};
+
+    process.on('uncaughtException', function(err) {
+        process.stderr.write("\n"+err.stack+"\n\n");
+    });
+
+    fs.readFile(this.logfile, function (err, data) {
+		try {
+			if (err) throw err;
+			console.log("Loaded file");
+			this.object = JSON.parse(data);
+		} 
+        catch (e) {console.log(e);} 
+	}.bind(this));
+    
+    setTimeout(this.save_log().bind(this), 60*60*1000);
+
+    console.log("connecting...");
+    this.connection = net.createConnection(this.port, this.host);
+    this.connection.setKeepAlive(true);
+    this.connection.setEncoding("utf-8");
+    this.connection.on('data', this.receive_data.bind(this));
+    this.connection.on('connect', this.connect.bind(this));
 };
 
-
-util.inherits(JSBot, Bot);
-
-
-JSBot.prototype.init = function() {
-	Bot.prototype.init.call(this);
-
-	//Technically it's more of a lucky search, only returns one result
-	this.register_command("google", Commands.google);
-	this.register_command("g", "google");
-
-	// Never called directly, just an interface for factoids
-	this.register_command("factoid", Commands.factoid);
-	
-	this.register_command("quote", Commands.quote);
-
-	//Only HTML Validator right now, CSS (and maybe JS) coming soon
-	this.register_command("validate", Commands.validate);
-	this.register_command("v", "validate");
-
-	//Goo.gl shortener
-	this.register_command("shorten", Commands.shorten);
-	this.register_command("s", "shorten");
-
-	//Search MDN docs
-	this.register_command("mdn", Commands.mdn);
-
-	//Search WPD docs
-	this.register_command("wpd", Commands.wpd);
-	
-	//Gives caniuse data and links
-	this.register_command("caniuse", Commands.caniuse);
-	this.register_command("ciu", "caniuse");
-
-	//Returns a link to the WHATWG HTML LS definition for an element
-	this.register_command("whatwg", Commands.whatwg);
-
-	this.register_command("lmgtfy", Commands.lmgtfy);
-	this.register_command("l", "lmgtfy");
-
-	// Info/giving factoids
-	this.register_command("tell", Commands.tell, false);
-	this.register_command("msg", Commands.msg, false);
-
-	this.register_command("ping", Commands.ping);
-	this.register_command("bot", Commands.iambot);
-
-	//factoid stuff
-	this.register_command("learn", Commands.learn);
-	this.register_command("forget", Commands.forget);
-	this.register_command("commands", Commands.commands);
-
-	//Power stuff
-	this.register_command("op", Commands.op, false);
-	this.register_command("deop", Commands.deop, false);
-	this.register_command("voice", Commands.voice, false);
-	this.register_command("devoice", Commands.devoice, false);
-	this.register_command("quiet", Commands.quiet, false);
-	this.register_command("unquiet", Commands.unquiet, false);
-	this.register_command("kick", Commands.kick, false);
-	this.register_command("whois", Commands.whois);
-	this.register_command("join", Commands.join);
-
-	//PhantomJS stuff
-	this.register_command('screenshot', Commands.screenshot);
-
-	//Travis CI stuff
-	this.register_command('build', Commands.build);
-	this.register_command('restart', Commands.restart);
+Bot.prototype.disconnect = function(client, why) {
+    console.log("disconnected: "+why);
+    setTimeout(this.connect(), 15000);
 };
 
-var profile = require("./vbot-profile.js");
-(new JSBot(profile)).init();
+Bot.prototype.connect = function() {
+    this.connection.write("NICK "+this.nick + "\r\n" + "USER "+this.user+" 0 * :"+this.real + "\r\n", "utf-8");
+};
+
+Bot.prototype.receive_data = function(chunk) {
+    this.buffer += chunk;
+    while (this.buffer) {
+        var offset = this.buffer.indexOf("\r\n");
+        if (offset < 0) return;
+        var incoming = this.buffer.substr(0, offset);
+        this.buffer = this.buffer.substr(offset + 2);
+        console.log(incoming);
+        incoming = String(incoming);
+        incoming = incoming.replace(/\x03\d{0,2},?\d{1,2}|[\x02\x06\x07\x0f\x16\x17\x1b\x1d\x1f]/g, "");
+        incoming = incoming.replace(/[\x00\x01\x04\x05\x08-\x0e\x10-\x15\x18-\x1a\x1c\x1e]/g, "");
+        if (incoming.match(/PRIVMSG/)) {
+            var msg = incoming.match(/^\:(\S+)\!\S+\sPRIVMSG\s(\S+)\s.*$/);
+            console.log(msg);
+            this.log_nick(msg[2], msg[1]);
+        }
+        else if (incoming.match(/INVITE/)) {
+            var channel = incoming.match(/(\#\w+)/);
+            this.connection.write("JOIN " + channel+ "\r\n", "utf-8");
+        }
+        else if (incoming.match(/PING/)) {
+            var message = incoming.match(/^PING\s(\:.+)$/);
+            this.connection.write("PONG " + message + "\r\n", "utf-8");
+        }
+        else if (incoming.match(/376/)) {
+            for (var i=0; i<this.channels.length; i++) {
+           	    this.connection.write("JOIN "+ this.channels[i] + "\r\n", "utf-8");
+            }
+            console.log("connected");
+        }
+    }
+};
+
+Bot.prototype.log_nick = function(channel, nick) {
+    console.log(nick, channel);
+    if (this.nicklog[channel]) {
+        if (this.nicklog[channel][nick]) this.nicklog[channel][nick]++;
+        else this.nicklog[channel][nick] = 1;
+    }
+    else {
+        this.nicklog[channel] = {};
+        this.nicklog[channel][nick] = 1;
+    }
+};
+
+Bot.prototype.save_log = function() {
+	try {
+		var write = JSON.stringify(this.nicklog, null, "\t");
+		fs.writeFile(this.logfile, write, function (err) {
+			if (err) this.connection.write("PRIVMSG emerson :help me pls");
+			console.log("Wrote file");
+		}).bind(this);
+	} 
+    catch (e) {this.connection.write("PRIVMSG emerson :help me pls");}   
+};
+
+var profile = require('./profile.js');
+(new Bot(profile));
