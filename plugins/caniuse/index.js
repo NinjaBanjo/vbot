@@ -42,16 +42,15 @@ var DATA_SOURCE = {
 	method: 'GET'
 };
 
-var CanIUseServer = module.exports = function(filename) {
+var CanIUseServer = module.exports = function(bot) {
 	this.loaded = false;
 	this.attemptsRemaining = MAX_RETRY_ATTEMPTS;
+    this.db = {};
+	this.fetchJSON();
 
-	if (filename) {
-		this.filename = filename;
-		this.readJSON();
-	} else {
-		this.fetchJSON();
-	}
+    bot.register_command('caniuse', this.find.bind(this));
+    bot.register_command('ciu', 'caniuse');
+    bot.register_command('searchciu', this.search.bind(this));
 };
 
 CanIUseServer.prototype.readJSON = function() {
@@ -117,7 +116,6 @@ CanIUseServer.prototype.parseJSON = function(json, source) {
 
 CanIUseServer.prototype.buildIndex = function() {
 	var db = this.db.data;
-
 	this.index = [];
 
 	this.index = Object.keys(db).map(makeIndexObjects);
@@ -134,40 +132,27 @@ CanIUseServer.prototype.buildIndex = function() {
 	}
 };
 
-CanIUseServer.prototype.search = function(key) {
+CanIUseServer.prototype.search = function(context, key) {
 	key = key.toLowerCase();
 
 	if (key === 'caniuse') {
-		return 'Yes.';
+		context.bot.send_message(context.channel, 'Yes.', context.intent);
+        return;
 	}
 
-	if (!this.loaded) {
-		return;
+	var matches = this.index.filter(matchSubstring(key));
+	var matchCount = matches.length;
+
+	matches = matches.slice(0, MAX_SEARCH_MATCHES).map(pullOutProperty('key'))
+	matchCount -= matches.length;
+
+	var response = 'Found: ' + matches.join(', ');
+
+	if(matchCount > 0) {
+		response += ' (' + matchCount + ' more...)';
 	}
 
-	try {
-		return this.find(key);
-	} catch(e) {
-		var matches = this.index.filter(matchSubstring(key));
-		var matchCount = matches.length;
-
-		if (matchCount === 1) {
-			return this.find(matches[0].key);
-		} else if (matchCount > 1) {
-			matches = matches.slice(0, MAX_SEARCH_MATCHES).map(pullOutProperty('key'))
-			matchCount -= matches.length;
-
-			var response = 'Found: ' + matches.join(', ');
-
-			if(matchCount > 0) {
-				response += ' (' + matchCount + ' more...)';
-			}
-
-			return response;
-		}
-
-		throw e;
-	}
+	context.bot.send_message(context.channel, response, context.intent);
 
 	function matchSubstring(substring) {
 		return function(indexObject) {
@@ -182,11 +167,12 @@ CanIUseServer.prototype.search = function(key) {
 	}
 };
 
-CanIUseServer.prototype.find = function(key) {
+CanIUseServer.prototype.find = function(context, key) {
 	var db = this.db.data;
 
 	if (typeof db[key] === "undefined") {
-		throw new Error("Can I Use `"+key+"` was not found.");
+		context.bot.send_message(context.channel, "Can I Use `"+key+"` was not found.", context.intent);
+        return;
 	}
 
 	var feature = db[key];
@@ -196,7 +182,8 @@ CanIUseServer.prototype.find = function(key) {
 	var unsupportedString = agentSupportInfo.unsupported.join(', ');
 	var overallPercent = (feature.usage_perc_y + feature.usage_perc_a);
 
-	return formatResponse(feature.title, supportedString, unsupportedString, overallPercent, key);
+	var message = formatResponse(feature.title, supportedString, unsupportedString, overallPercent, key);
+    context.bot.send_message(context.channel, message, context.intent);
 };
 
 CanIUseServer.prototype.getAgentSupportArray = function(feature) {
