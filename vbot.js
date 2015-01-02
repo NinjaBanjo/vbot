@@ -167,7 +167,7 @@ Bot.prototype.receive_data = function(chunk) {
                     this.parse_message(channel, mask[1], text);
                     break;
                 case "JOIN":
-                    var channel = message.message;
+                    var channel = message.message || message.params[0];
                     var mask = message.prefix.match(/^:(.*)!(\S+)@(\S+)/);
                     this.parse_message(channel, mask[1], 'join');
                     break;
