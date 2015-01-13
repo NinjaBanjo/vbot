@@ -1,8 +1,7 @@
 var http = require("http");
 
 var HTMLValidator = module.exports = function(bot) {
-    bot.register_command('validate', this.validate);
-    bot.register_command('v', 'validate');
+    bot.register_command('v', this.validate);
 };
 
 HTMLValidator.prototype.validate = function(context, text) {
