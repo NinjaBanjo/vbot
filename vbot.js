@@ -71,27 +71,19 @@ Bot.prototype.parse_message = function(channel, sender, text) {
         text: text
     };
 
-    var command_matches = text.match(/^(\w+)\s?(.*)?$/);
-    var factoid_matches = text.match(/^\.([^@]+)(?:\s@\s(.*))?$/);
-    if (command_matches) {
-        var command = command_matches[1].toLowerCase();
-        var params = command_matches[2] || false;
-        if (this.commands[command]) {
-            if (params) {
-                var split_intent = params.match(/^(\w+)\s@\s?(\w+\s*)+$/i);
-                if (split_intent) {
-                    params = split_intent[1];
-                    if (split_intent[2]) context.intent = split_intent[2];
-                }
-            }
+    var message_matches = text.match(/^\.([^@]+)(?:\s@\s(.*))?$/);
+    if (message_matches) {
+        if (message_matches[2]) context.intent = message_matches[2];
+        var possible_command = message_matches[1].match(/^(\w+)\s?(.*)?$/);
+        if (possible_command && this.commands[possible_command[1]]) {
+            var command = possible_command[1];
+            var params = possible_command[2] || '';
             this.commands[command].callback.call(this, context, params, command);
         }
-    }
-    else if (factoid_matches) {
-        var factoid = factoid_matches[1];
-        if (factoid_matches[2]) context.intent = factoid_matches[2];
-
-        this.commands['factoid'].callback.call(this, context, factoid, 'factoid');
+        else {
+            var factoid = message_matches[1];
+            this.commands['factoid'].callback.call(this, context, factoid, 'factoid');
+        }
     }
 };
 
