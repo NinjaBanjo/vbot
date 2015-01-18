@@ -144,6 +144,7 @@ Bot.prototype.receive_data = function(chunk) {
                     for (var i=0; i<this.channels.length; i++) {
                         this.send_raw("JOIN " + this.channels[i]);
                     }
+                    this.send_raw("MODE " + this.nick + " +gw");
                     console.log("connected");
                     break;
                 case 376:
@@ -165,6 +166,7 @@ Bot.prototype.receive_data = function(chunk) {
                     break;
                 case "INVITE":
                     this.send_raw("JOIN "+message.message);
+                    console.log(message);
                     break;
                 default:
                     break;
