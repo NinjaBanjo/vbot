@@ -1,7 +1,9 @@
 var http = require('http');
 
 var FeelingLucky = module.exports = function(bot) {
-    bot.register_command('l', this.lucky);
+    bot.register_command('lucky', this.lucky);
+    bot.register_command('google', 'lucky');
+    bot.register_command('l', 'lucky');
     bot.register_command('g', 'lucky');
     bot.register_command('mdn', this.mdn);
     bot.register_command('wpd', this.wpd);
