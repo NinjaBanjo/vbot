@@ -71,7 +71,7 @@ Bot.prototype.parse_message = function(channel, sender, text) {
         text: text
     };
 
-    var message_matches = text.match(/^[\.\`\]\>]([^@]+)(?:\s@\s(.*))?$/);
+    var message_matches = text.match(/^[\.\`\!\>]([^@]+)(?:\s@\s(.*))?$/);
     if (message_matches) {
         if (message_matches[2]) context.intent = message_matches[2];
         var possible_command = message_matches[1].match(/^(\w+)\s?(.*)?$/);
