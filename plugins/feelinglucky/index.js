@@ -10,14 +10,14 @@ var FeelingLucky = module.exports = function(bot) {
 };
 
 FeelingLucky.prototype.lucky = function(context, text) {
-    search(context, text + ' -site:w3schools.com');
+    search(context, text);
 };
 
 function search(context, text) {
 	var options = {
 	  	hostname: 'ajax.googleapis.com',
 	  	port: 80,
-	  	path: '/ajax/services/search/web?v=1.0&q=' + encodeURIComponent(text),
+	  	path: '/ajax/services/search/web?v=1.0&q=' + encodeURIComponent(text + ' -site:w3schools.com'),
 	  	method: 'GET'
 	};
 	var req = http.request(options, function(res) {
@@ -32,7 +32,7 @@ function search(context, text) {
 				var url = decodeURIComponent(results[0].url);
 				var title = results[0].titleNoFormatting.replace(/&#(\d+);/g,
 							function(a, b){return String.fromCharCode(b);});
-                context.bot.send_message(context.channel, title + ' ' + url, context.intent);
+                context.bot.send_message(context.channel, title + ' ' + url + '. Other results: https://www.google.com/?#q='+ encodeURIComponent(text), context.intent);
             }
 		});
 	});
