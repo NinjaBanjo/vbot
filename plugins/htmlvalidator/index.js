@@ -2,6 +2,7 @@ var http = require("http");
 
 var HTMLValidator = module.exports = function(bot) {
     bot.register_command('v', this.validate);
+    bot.register_command('validate', 'v');
 };
 
 HTMLValidator.prototype.validate = function(context, text) {
@@ -24,7 +25,7 @@ HTMLValidator.prototype.validate = function(context, text) {
 	  	var numOfErrors = res.headers['x-w3c-validator-errors'];
 	  	var numOfWarnings = res.headers['x-w3c-validator-warnings'];
 	    var status = res.headers['x-w3c-validator-status'];
-        message += status;
+        message += status.toLowerCase();
         if (status === 'Invalid') message += ' with ' + numOfErrors + ' errors and ' + numOfWarnings + ' warnings. See full validation here: ' + url;
         else message += '.';
         context.bot.send_message(context.channel, message, context.intent);
