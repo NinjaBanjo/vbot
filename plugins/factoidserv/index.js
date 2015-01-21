@@ -23,6 +23,11 @@ var FactoidServer = module.exports = function(bot) {
 };
 
 FactoidServer.prototype.learn = function(context, text) {
+    if (text === "") {
+        context.bot.send_message(context.channel, "I think you need to learn how to properly use me.", context.sender);
+        return;
+    }
+    console.log(text);
     var key_matches = text.match(/^([^=]+)\s=\s(.+)$/);
     var key = key_matches[1].toLowerCase();
     var value = key_matches[2];
@@ -32,6 +37,10 @@ FactoidServer.prototype.learn = function(context, text) {
 };
 
 FactoidServer.prototype.alias = function(context, text) {
+     if (text === "") {
+        context.bot.send_message(context.channel, "I think you need to learn how to properly use me.", context.sender);
+        return;
+    }
     console.log(text);
 	var key_matches = text.match(/^([^>]+)\s>\s(.+)$/);
     var alias = key_matches[1];
@@ -59,7 +68,8 @@ FactoidServer.prototype.find = function(context, text) {
 	key = text.toLowerCase();
 
 	if (typeof this.db[key] === "undefined") {
-		context.bot.send_message(context.channel, "Sorry, i don't know what that is :/", context.sender);
+		// This is noisy...
+        //context.bot.send_message(context.channel, "Sorry, i don't know what that is :/", context.sender);
         return;
 	}
 
@@ -92,7 +102,11 @@ FactoidServer.prototype.search = function(context, text) {
 
 
 FactoidServer.prototype.forget = function(context, text) {
-	key = text.toLowerCase();
+	 if (text === "") {
+        context.bot.send_message(context.channel, "Did you forget how to use me?", context.sender);
+        return;
+    }
+    key = text.toLowerCase();
 
 	if (typeof this.db[key] === "undefined") {
 		context.bot.send_message(context.channel, "`"+key+"` was not a factoid.", context.intent);

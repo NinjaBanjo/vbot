@@ -6,6 +6,10 @@ var HTMLValidator = module.exports = function(bot) {
 };
 
 HTMLValidator.prototype.validate = function(context, text) {
+    if (text === "") {
+        context.bot.send_message(context.channel, "It would be nice if you gave me a site to validate...", context.sender);
+        return;
+    }
 	var url = 'http://validator.w3.org/check?uri=' + encodeURIComponent(text);
 
 	var options = {
