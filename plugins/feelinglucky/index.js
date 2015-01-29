@@ -32,7 +32,7 @@ function search(context, text) {
 				var url = decodeURIComponent(results[0].url);
 				var title = results[0].titleNoFormatting.replace(/&#(\d+);/g,
 							function(a, b){return String.fromCharCode(b);});
-                context.bot.send_message(context.channel, title + ' ' + url + '. Other results: https://www.google.com/?#q='+ encodeURIComponent(text), context.intent);
+                context.bot.send_message(context.channel, title + ' ' + url, context.intent);
             }
 		});
 	});
