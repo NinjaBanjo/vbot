@@ -1,4 +1,5 @@
 var net = require("net");
+var tls = require("tls");
 var plugins = require("./plugins.js");
 
 var Bot = module.exports = function(profile) {
@@ -26,11 +27,11 @@ var Bot = module.exports = function(profile) {
 
 Bot.prototype.init = function() {
     console.log("connecting...");
-    this.connection = net.createConnection(this.profile.port, this.profile.host);
+    this.connection = tls.connect(this.profile.port, this.profile.host, {});
     this.connection.setKeepAlive(true);
     this.connection.setEncoding("utf-8");
     this.connection.on('data', this.receive_data.bind(this));
-    this.connection.on('connect', this.connect.bind(this));
+    this.connection.on('secureConnect', this.secureConnect.bind(this));
     for (var plugin in plugins) {
         if (plugins.hasOwnProperty(plugin)) {
             this[plugin] = new plugins[plugin](this);
@@ -120,7 +121,7 @@ Bot.prototype.send_raw = function(message) {
     this.connection.write(message + "\r\n", this.encoding);
 };
 
-Bot.prototype.connect = function() {
+Bot.prototype.secureConnect = function() {
     this.send_raw("NICK "+this.nick);
     this.send_raw("USER "+this.user+" 0 * :"+this.real);
 };
@@ -169,6 +170,7 @@ Bot.prototype.receive_data = function(chunk) {
                     console.log(message);
                     break;
                 default:
+                    console.log(message);
                     break;
             }
         }
