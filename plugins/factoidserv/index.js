@@ -27,12 +27,16 @@ FactoidServer.prototype.learn = function(context, text) {
         context.bot.send_message(context.channel, "I think you need to learn how to properly use me.", context.sender);
         return;
     }
-    console.log(text);
+    if (context.channel.indexOf('#') === -1) {
+        context.bot.send_message(context.channel, "Sorry, factoids can't be changed in pm. Go to ##vbot to change factoids.", context.sender);
+        return;
+    }
     var key_matches = text.match(/^([^=]+)\s=\s(.+)$/);
     var key = key_matches[1].toLowerCase();
     var value = key_matches[2];
 	this.db[key] = {value: value};
     context.bot.send_message(context.channel, "Okay, I learned that", context.intent);
+    console.log("I learned " + key + " is " + value + " from " + context.sender);
     this.save();
 };
 
@@ -41,7 +45,10 @@ FactoidServer.prototype.alias = function(context, text) {
         context.bot.send_message(context.channel, "I think you need to learn how to properly use me.", context.sender);
         return;
     }
-    console.log(text);
+    if (context.channel.indexOf('#') === -1) {
+        context.bot.send_message(context.channel, "Sorry, factoids can't be changed in pm. Go to ##vbot to change factoids.", context.sender);
+        return;
+    }
 	var key_matches = text.match(/^([^>]+)\s>\s(.+)$/);
     var alias = key_matches[1];
     var key = key_matches[2];
@@ -49,17 +56,18 @@ FactoidServer.prototype.alias = function(context, text) {
 	alias = alias.toLowerCase();
 
 	if (typeof this.db[key] === "undefined") {
-        context.bot.send_message(context.channel, "Factoid `"+key+"` doesn't exist.", context.intent);
+        context.bot.send_message(context.channel, "Factoid `"+key+"` doesn't exist.", context.sender);
         return;
     }
 
 	if (alias === key) {
-        context.bot.send_message(context.channel, "Cannot alias yourself.", context.intent);
+        context.bot.send_message(context.channel, "Cannot alias yourself.", context.sender);
         return;
     }
 
 	this.db[alias] = {alias: key}
     context.bot.send_message(context.channel, "Done.", context.intent);
+    console.log("I learned " + alias + " is an alias for " + key + " from " + context.sender);
     this.save();
 };
 
@@ -109,12 +117,17 @@ FactoidServer.prototype.forget = function(context, text) {
     key = text.toLowerCase();
 
 	if (typeof this.db[key] === "undefined") {
-		context.bot.send_message(context.channel, "`"+key+"` was not a factoid.", context.intent);
+		context.bot.send_message(context.channel, "`"+key+"` was not a factoid.", context.sender);
         return;
 	}
+    if (context.channel.indexOf('#') === -1) {
+        context.bot.send_message(context.channel, "Sorry, factoids can't be changed in pm. Go to ##vbot to change factoids.", context.sender);
+        return;
+    }
 
 	delete this.db[key];
-    context.bot.send_message(context.channel, "I've forgotten what I knew about " + key, context.intent);
+    context.bot.send_message(context.channel, "I've forgotten what I knew about " + key, context.sender);
+    console.log(context.sender + " told me to forget about " + key);
     this.save();
 };
 

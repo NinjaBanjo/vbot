@@ -1,6 +1,5 @@
 var net = require("net");
 var tls = require("tls");
-var plugins = require("./plugins.js");
 
 var Bot = module.exports = function(profile) {
     this.profile = profile;
@@ -17,6 +16,8 @@ var Bot = module.exports = function(profile) {
 
     this.channels = profile.channels;
 
+    this.loadedPlugins = profile.plugins;
+
     this.commands = {};
 
     process.on('uncaughtException', function(err) {
@@ -32,9 +33,9 @@ Bot.prototype.init = function() {
     this.connection.setEncoding("utf-8");
     this.connection.on('data', this.receive_data.bind(this));
     this.connection.on('secureConnect', this.secureConnect.bind(this));
-    for (var plugin in plugins) {
-        if (plugins.hasOwnProperty(plugin)) {
-            this[plugin] = new plugins[plugin](this);
+    for (var plugin in this.loadedPlugins) {
+        if (this.loadedPlugins.hasOwnProperty(plugin)) {
+            this[plugin] = new this.loadedPlugins[plugin](this);
         }
     }
     console.log('plugins loaded');
@@ -57,22 +58,21 @@ Bot.prototype.register_command = function(command, callback) {
 
 Bot.prototype.disconnect = function(client, why) {
     console.log("disconnected: "+why);
-    setTimeout(this.connect(), 15000);
 };
 
 Bot.prototype.parse_message = function(channel, sender, text) {
-    //no pms
-    if (channel.indexOf('#') === -1) return;
     text = text.trim();
 
     var context = {
         bot: this,
         channel: channel,
         intent: sender,
+        sender: sender,
         text: text
     };
 
-    var message_matches = text.match(/^[\.\`\!\>]([^@]+)(?:\s@\s(.*))?$/);
+    if (context.channel === this.profile.nick) context.channel = context.sender;
+    var message_matches = text.match(/^[\.\`\!]([^@]+)(?:\s@\s(.*))?$/);
     if (message_matches) {
         if (message_matches[2]) context.intent = message_matches[2];
         var possible_command = message_matches[1].match(/^(\w+)\s?(.*)?$/);
@@ -145,7 +145,6 @@ Bot.prototype.receive_data = function(chunk) {
                     for (var i=0; i<this.channels.length; i++) {
                         this.send_raw("JOIN " + this.channels[i]);
                     }
-                    this.send_raw("MODE " + this.nick + " +gw");
                     console.log("connected");
                     break;
                 case 376:
@@ -170,7 +169,8 @@ Bot.prototype.receive_data = function(chunk) {
                     console.log(message);
                     break;
                 default:
-                    console.log(message);
+                    var type = ["NICK", "PART", "QUIT"].indexOf(message.command);
+                    if (type === -1) console.log(message);
                     break;
             }
         }
