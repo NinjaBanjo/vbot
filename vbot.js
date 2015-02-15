@@ -3,23 +3,8 @@ var tls = require("tls");
 
 var Bot = module.exports = function(profile) {
     this.profile = profile;
-    this.port = profile.port;
-    this.host = profile.host;
-    this.ssl = profile.ssl || false;
-
     this.buffer = '';
-
-    this.nick = profile.nick;
-    this.user = profile.user;
-    this.real = profile.real;
-    this.password = profile.password;
-
-    this.channels = profile.channels;
-
-    this.loadedPlugins = profile.plugins;
-
     this.commands = {};
-
     process.on('uncaughtException', function(err) {
         process.stderr.write("\n"+err.stack+"\n\n");
     });
@@ -33,9 +18,9 @@ Bot.prototype.init = function() {
     this.connection.setEncoding("utf-8");
     this.connection.on('data', this.receive_data.bind(this));
     this.connection.on('secureConnect', this.secureConnect.bind(this));
-    for (var plugin in this.loadedPlugins) {
-        if (this.loadedPlugins.hasOwnProperty(plugin)) {
-            this[plugin] = new this.loadedPlugins[plugin](this);
+    for (var plugin in this.profile.plugins) {
+        if (this.profile.plugins.hasOwnProperty(plugin)) {
+            this[plugin] = new this.profile.plugins[plugin](this);
         }
     }
     console.log('plugins loaded');
@@ -122,8 +107,8 @@ Bot.prototype.send_raw = function(message) {
 };
 
 Bot.prototype.secureConnect = function() {
-    this.send_raw("NICK "+this.nick);
-    this.send_raw("USER "+this.user+" 0 * :"+this.real);
+    this.send_raw("NICK "+this.profile.nick);
+    this.send_raw("USER "+this.profile.user+" 0 * :"+this.profile.real);
 };
 
 Bot.prototype.receive_data = function(chunk) {
@@ -142,13 +127,13 @@ Bot.prototype.receive_data = function(chunk) {
         if (message !== false) {
             switch (message.command) {
                 case 1: // RPL_WELCOME
-                    for (var i=0; i<this.channels.length; i++) {
-                        this.send_raw("JOIN " + this.channels[i]);
+                    for (var i=0; i<this.profile.channels.length; i++) {
+                        this.send_raw("JOIN " + this.profile.channels[i]);
                     }
                     console.log("connected");
                     break;
                 case 376:
-                    this.send_message("NickServ", "identify "+this.password);
+                    this.send_message("NickServ", "identify "+this.profile.password);
                     break;
                 case "PING":
                     this.send_raw("PONG :"+message.message);
