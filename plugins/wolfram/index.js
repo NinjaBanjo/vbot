@@ -37,13 +37,16 @@ WolframAlpha.prototype.queryWolfram = function(context, text) {
                 return;
             }
             else {
-                root.find('pod').map(function(pod) {
-                    var title = pod.attr('title').value();
-                    if (title === "Result") {
-                        var value = pod.find('subpod').map(function(node) {return node.get('plaintext').text();});
-                        context.bot.send_message(context.channel, value + ". Link: " + url, context.intent);
-                    }
-                });
+                if (root.find('pod').length !== 0) {
+                    root.find('pod').map(function(pod) {
+                        var title = pod.attr('title').value();
+                        if (title === "Result") {
+                            var value = pod.find('subpod').map(function(node) {return node.get('plaintext').text();});
+                            context.bot.send_message(context.channel, value + ". Link: " + url, context.intent);
+                        }
+                    });
+                }
+                else context.bot.send_message(context.channel, "Sorry, wolfram can't calculate that", context.sender);
             }
         });
     });
