@@ -154,7 +154,7 @@ Bot.prototype.receive_data = function(chunk) {
                     console.log(message);
                     break;
                 default:
-                    var type = ["NICK", "PART", "QUIT"].indexOf(message.command);
+                    var type = this.profile.noLog.indexOf(message.command);
                     if (type === -1) console.log(message);
                     break;
             }
