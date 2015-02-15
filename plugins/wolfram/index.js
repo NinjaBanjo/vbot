@@ -12,7 +12,10 @@ WolframAlpha.prototype.queryWolfram = function(context, text) {
         return;
     }
 
-    var url = 'https://www.wolframalpha.com/input/?i=' + encodeURIComponent(text);
+    var url = "";
+    context.bot.shorten_url('https://www.wolframalpha.com/input/?i=' + encodeURIComponent(text), function(shortUrl) {
+        url = shortUrl;
+    });
 
     var options = {
         hostname: 'api.wolframalpha.com',

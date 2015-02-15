@@ -1,5 +1,6 @@
 var net = require("net");
 var tls = require("tls");
+var https = require("https");
 
 var Bot = module.exports = function(profile) {
     this.profile = profile;
@@ -165,6 +166,35 @@ Bot.prototype.receive_data = function(chunk) {
 Bot.prototype.send_message = function(channel, message, user) {
     if (user) message = user + ": " + message;
     this.send_raw("PRIVMSG " + channel + " :" + message);
+};
+
+Bot.prototype.shorten_url = function(url, cb) {
+    var options = {
+	  	hostname: 'www.googleapis.com',
+	  	port: 443,
+	  	path: '/urlshortener/v1/url',
+	  	method: 'POST',
+	  	headers: {
+	  		"Content-Type": "application/json"
+	  	}
+	};
+    var self= this;
+	var req = https.request(options, function(res) {
+	  	res.setEncoding('utf8');
+	  	res.on('data', function (chunk) {
+		    body = JSON.parse(chunk);
+            cb.call(self, body.id);
+		});
+	});
+
+	var payload = '{"longUrl": "'+ url + '"}';
+
+	req.write(payload);
+
+	req.on('error', function(e) {
+	  	console.log('problem with request: ' + e.message);
+	});
+	req.end();
 };
 
 var profile = require('./profile.js');

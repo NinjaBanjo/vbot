@@ -10,7 +10,10 @@ HTMLValidator.prototype.validate = function(context, text) {
         context.bot.send_message(context.channel, "It would be nice if you gave me a site to validate...", context.sender);
         return;
     }
-	var url = 'http://validator.w3.org/check?uri=' + encodeURIComponent(text);
+	var url = '';
+    context.bot.shorten_url('http://validator.w3.org/check?uri=' + encodeURIComponent(text), function(shortUrl) {
+        url = shortUrl;
+    });
 
 	var options = {
 	  	hostname: 'validator.w3.org',
