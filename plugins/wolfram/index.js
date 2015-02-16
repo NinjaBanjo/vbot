@@ -44,7 +44,7 @@ WolframAlpha.prototype.queryWolfram = function(context, text) {
                     root.find('pod').map(function(pod) {
                         var title = pod.attr('title').value();
                         if (title === "Result") {
-                            var value = pod.find('subpod').map(function(node) {return node.get('plaintext').text();});
+                            var value = pod.find('subpod')[0].get('plaintext').text().replace(/\r?\n/, " ");
                             context.bot.send_message(context.channel, value + ". Link: " + url, context.intent);
                         }
                     });
