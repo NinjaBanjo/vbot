@@ -7,7 +7,7 @@ Better docs are coming soon (hopefully), but for now, here's an overview:
 
 ##Triggers
 
-All commands and factoids must be prefixed with a trigger key. Currently the trigger key can be either `.`, `\``, or `!`
+All commands and factoids must be prefixed with a trigger key. Currently the trigger key can be either `.`, `\`, or `!`
 
 ---
 
