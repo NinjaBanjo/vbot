@@ -22,6 +22,9 @@ Memo.prototype.save = function(context, text) {
 };
 
 Memo.prototype.tell = function(context, text) {
+    if (context.intent.indexOf('_') === context.intent.length - 1) {
+        context.intent = context.intent.slice(0, -1);
+    }
     if (memos[context.intent] && memos[context.intent][context.channel]) {
         for (var i=0; i<memos[context.intent][context.channel].length; i++) {
             context.bot.send_message(context.channel, memos[context.intent][context.channel].pop(), context.intent);
