@@ -3,7 +3,11 @@ vbot
 
 vbot is an IRC bot meant to be quick and modular. Basic functionality is handled with a group of core plugins, and the rest of the functionality is implemented using plugins.
 
-Better docs are coming soon (hopefully), but for now, here's an overview of the plugins:
+Better docs are coming soon (hopefully), but for now, here's an overview:
+
+##Triggers
+
+All commands and factoids must be prefixed with a trigger key. Currently the trigger key can be either `.`, `\``, or `!`
 
 ---
 
