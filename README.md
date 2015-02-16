@@ -24,9 +24,16 @@ Commands:
 Commands:
 * `js <code>` A JavaScript interpreter.
 * `bf <code>` A brainfuck interpreter.
+* `php <code>` A PHP interpreter.
+* `perl <code>` Perl interpreter
+* `ruby/rb <code>` Ruby interpreter
+* `py <code>` Python 2 interpreter
+* `py3 <code>` Python 3 interpreter
 
 Requirements:
-`bf` needs the `hsbrainfuck` package installed to work
+Needs the `hsbrainfuck`, `perl`, `php5-cli`, `ruby`, `python`, `python3` packages installed for the respective interpreters to work
+
+Notes: This is meant to be used for simple one-line scripts and small outputs. All newlines will be replaced by a space to prevent flooding
 
 #####factoidserv
 
