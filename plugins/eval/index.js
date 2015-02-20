@@ -13,7 +13,7 @@ var Eval = module.exports = function(bot) {
 };
 
 Eval.prototype.runJS = function(context, text) {
-    var output = vm.runInThisContext(text);
+    var output = vm.runInThisContext(text, {timeout: '5000'});
     context.bot.send_message(context.channel, output, context.intent);
 };
 
