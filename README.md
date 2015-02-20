@@ -28,7 +28,7 @@ Commands:
 * `bf <code>` A brainfuck interpreter.
 * `php <code>` A PHP interpreter.
 * `perl <code>` Perl interpreter
-* `ruby/rb <code>` Ruby interpreter
+* `rb <code>` Ruby interpreter
 * `py <code>` Python 2 interpreter
 * `py3 <code>` Python 3 interpreter
 
