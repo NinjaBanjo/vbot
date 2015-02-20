@@ -18,7 +18,7 @@ Eval.prototype.runJS = function(context, text) {
         output = vm.runInThisContext(text, {timeout: 5000});
     }
     catch (e) {
-        output = e.toString();
+        output = e.toString().slice(0, e.toString().indexOf("\n"));
     }
     context.bot.send_message(context.channel, output, context.intent);
 };
