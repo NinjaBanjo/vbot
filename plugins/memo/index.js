@@ -26,8 +26,15 @@ Memo.prototype.tell = function(context, text) {
         context.intent = context.intent.slice(0, -1);
     }
     if (memos[context.intent] && memos[context.intent][context.channel]) {
-        for (var i=0; i<memos[context.intent][context.channel].length; i++) {
-            context.bot.send_message(context.channel, memos[context.intent][context.channel].pop(), context.intent);
+        if (memos[context.intent][context.channel].length < 3) {
+            for (var i=0; i<memos[context.intent][context.channel].length; i++) {
+                context.bot.send_message(context.channel, memos[context.intent][context.channel].pop(), context.intent);
+            }
+        }
+        else {
+            for (var i=0; i<memos[context.intent][context.channel].length; i++) {
+                context.bot.send_message(context.intent, memos[context.intent][context.channel].pop(), context.intent);
+            }
         }
     }
 };

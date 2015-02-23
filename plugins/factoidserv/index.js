@@ -2,7 +2,7 @@ var fs = require("fs");
 
 var FactoidServer = module.exports = function(bot) {
 	this.changed = false;
-    this.file = './plugins/factoidserv/factoids.json';
+    this.file = bot.profile.factoids;
     fs.readFile(this.file, function (err, data) {
 		try {
 			if (err) throw err;

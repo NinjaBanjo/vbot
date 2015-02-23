@@ -1,4 +1,3 @@
 profile.js
 node_modules/
-vbot-old-factoids.json
-quotes.json
+factoids.json
