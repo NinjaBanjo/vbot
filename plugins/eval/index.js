@@ -1,4 +1,6 @@
 var vm = require("vm");
+var fs = require("fs");
+var crypto = require('crypto');
 var exec = require('child_process').exec;
 
 var Eval = module.exports = function(bot) {
@@ -18,7 +20,12 @@ Eval.prototype.runJS = function(context, text) {
         output = vm.runInThisContext(text, {timeout: 5000});
     }
     catch (e) {
-        output = e.toString().slice(0, e.toString().indexOf("\n"));
+        var dump = e.toString();
+        var filename = crypto.createHash('sha1').update(new Date().toString()).digest('hex').slice(0,8);
+        fs.writeFile('files/errors/' + filename + ".txt", dump, function (err) {
+			if (err) throw err;
+		});
+        output = e.toString().slice(0, e.toString().indexOf("\n")) + " Full error message here: http://vbot.emersonveenstra.net/errors/" + filename + '.txt';
     }
     context.bot.send_message(context.channel, output, context.intent);
 };
