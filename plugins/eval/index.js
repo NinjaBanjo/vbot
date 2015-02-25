@@ -25,7 +25,7 @@ Eval.prototype.runJS = function(context, text) {
         fs.writeFile('files/errors/' + filename + ".txt", dump, function (err) {
 			if (err) throw err;
 		});
-        output = e.toString().slice(0, e.toString().indexOf("\n")) + " Full error message here: http://vbot.emersonveenstra.net/errors/" + filename + '.txt';
+        output = e.name + ": http://vbot.emersonveenstra.net/errors/" + filename + '.txt';
     }
     context.bot.send_message(context.channel, output, context.intent);
 };
