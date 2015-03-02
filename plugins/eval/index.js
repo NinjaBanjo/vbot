@@ -25,9 +25,8 @@ Eval.prototype.runCode = function(context, command) {
 };
 
 Eval.prototype.saveError = function(context, e) {
-    var dump = e.replace(/\r?\n/g, " ");
     var filename = crypto.createHash('sha1').update(new Date().toString()).digest('hex').slice(0,8);
-    fs.writeFile('files/errors/' + filename + ".txt", dump, function (err) {
+    fs.writeFile('files/errors/' + filename + ".txt", e, function (err) {
         if (err) throw err;
     });
     var output = e.name + ": http://vbot.emersonveenstra.net/errors/" + filename + '.txt';
