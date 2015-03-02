@@ -6,6 +6,7 @@ var exec = require('child_process').exec;
 var Eval = module.exports = function(bot) {
     bot.register_command('js', this.runJS);
     bot.register_command('node', this.runNode);
+    bot.register_command('ba', this.runBabel);
     bot.register_command('bf', this.runBF);
     bot.register_command('php', this.runPHP);
     bot.register_command('perl', this.runPerl);
@@ -104,6 +105,18 @@ Eval.prototype.runPythonThree = function(context, text) {
 
 Eval.prototype.runNode = function(context, text) {
     exec('node -e "console.log(' + text.replace(/\"/g, '\\"') + ')"', {timeout: 5000}, function(error, stdout, stderr) {
+        if (error !== null) {
+            context.bot.send_message(context.channel, stderr.replace(/\r?\n/g, " "), context.sender);
+        }
+
+        else {
+            context.bot.send_message(context.channel, stdout.replace(/\r?\n/g, " "), context.intent);
+        }
+    });
+};
+
+Eval.prototype.runBabel = function(context, text) {
+    exec("babel-node -e 'console.log(" + text.replace(/\'/g, "\\'") + ")'", {timeout: 5000}, function(error, stdout, stderr) {
         if (error !== null) {
             context.bot.send_message(context.channel, stderr.replace(/\r?\n/g, " "), context.sender);
         }
