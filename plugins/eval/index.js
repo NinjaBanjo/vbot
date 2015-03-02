@@ -4,125 +4,76 @@ var crypto = require('crypto');
 var exec = require('child_process').exec;
 
 var Eval = module.exports = function(bot) {
-    bot.register_command('js', this.runJS);
-    bot.register_command('node', this.runNode);
-    bot.register_command('ba', this.runBabel);
-    bot.register_command('bf', this.runBF);
-    bot.register_command('php', this.runPHP);
-    bot.register_command('perl', this.runPerl);
-    bot.register_command('rb', this.runRuby);
-    bot.register_command('py', this.runPython);
-    bot.register_command('py3', this.runPythonThree);
+    bot.register_command('js', this.runJS.bind(this));
+    bot.register_command('node', this.runNode.bind(this));
+    bot.register_command('ba', this.runBabel.bind(this));
+    bot.register_command('bf', this.runBF.bind(this));
+    bot.register_command('php', this.runPHP.bind(this));
+    bot.register_command('perl', this.runPerl.bind(this));
+    bot.register_command('rb', this.runRuby.bind(this));
+    bot.register_command('py', this.runPython.bind(this));
+    bot.register_command('py3', this.runPythonThree.bind(this));
 };
+
+Eval.prototype.runCode = function(context, command) {
+    exec(command, {timeout: 5000}, function(error, stdout, stderr) {
+        if (error !== null) this.saveError(context, stderr);
+        else {
+            context.bot.send_message(context.channel, stdout.replace(/\r?\n/g, " "), context.intent);
+        }
+    });
+};
+
+Eval.prototype.saveError = function(context, e) {
+    var dump = e.replace(/\r?\n/g, " ");
+    var filename = crypto.createHash('sha1').update(new Date().toString()).digest('hex').slice(0,8);
+    fs.writeFile('files/errors/' + filename + ".txt", dump, function (err) {
+        if (err) throw err;
+    });
+    var output = e.name + ": http://vbot.emersonveenstra.net/errors/" + filename + '.txt';
+    context.bot.send_message(context.channel, output, context.sender);
+};
+
 
 Eval.prototype.runJS = function(context, text) {
     var output;
     try {
         output = vm.runInThisContext(text, {timeout: 5000});
+        context.bot.send_message(context.channel, output, context.intent);
     }
     catch (e) {
-        var dump = e.toString();
-        var filename = crypto.createHash('sha1').update(new Date().toString()).digest('hex').slice(0,8);
-        fs.writeFile('files/errors/' + filename + ".txt", dump, function (err) {
-			if (err) throw err;
-		});
-        output = e.name + ": http://vbot.emersonveenstra.net/errors/" + filename + '.txt';
+        this.runBabel(context, text);
     }
-    context.bot.send_message(context.channel, output, context.intent);
 };
 
 Eval.prototype.runBF = function(context, text) {
-    exec('echo "' + text + '" | hsbrainfuck', {timeout: 5000}, function(error, stdout, stderr) {
-        if (error !== null) {
-            context.bot.send_message(context.channel, stderr.replace(/\r?\n/g, " "), context.sender);
-        }
-
-        else {
-            context.bot.send_message(context.channel, stdout.replace(/\r?\n/g, " "), context.intent);
-        }
-    });
+    this.runCode(context, 'echo "' + text + '" | hsbrainfuck ');
 };
 
 Eval.prototype.runPHP = function(context, text) {
-    exec('php5 -r "' + text.replace(/\"/g, '\\"') + '"', {timeout: 5000}, function(error, stdout, stderr) {
-        if (error !== null) {
-            context.bot.send_message(context.channel, stderr.replace(/\r?\n/g, " "), context.sender);
-        }
-
-        else {
-            context.bot.send_message(context.channel, stdout.replace(/\r?\n/g, " "), context.intent);
-        }
-    });
+  this.runCode(context, 'php5 -r "' + text.replace(/\"/g, '\\"') + '"');
 };
 
 Eval.prototype.runPerl = function(context, text) {
-    exec('perl -e "' + text.replace(/\"/g, '\\"') + '"', {timeout: 5000}, function(error, stdout, stderr) {
-        if (error !== null) {
-            context.bot.send_message(context.channel, stderr.replace(/\r?\n/g, " "), context.sender);
-        }
-
-        else {
-            context.bot.send_message(context.channel, stdout.replace(/\r?\n/g, " "), context.intent);
-        }
-    });
+    this.runCode(context, 'perl -e "' + text.replace(/\"/g, '\\"') + '"');
 };
 
 Eval.prototype.runRuby = function(context, text) {
-    exec('ruby -e "' + text.replace(/\"/g, '\\"') + '"', {timeout: 5000}, function(error, stdout, stderr) {
-        if (error !== null) {
-            context.bot.send_message(context.channel, stderr.replace(/\r?\n/g, " "), context.sender);
-        }
-
-        else {
-            context.bot.send_message(context.channel, stdout.replace(/\r?\n/g, " "), context.intent);
-        }
-    });
+    this.runCode(context, 'ruby -e "' + text.replace(/\"/g, '\\"') + '"');
 };
 
 Eval.prototype.runPython = function(context, text) {
-    exec('python -c "' + text.replace(/\"/g, '\\"') + '"', {timeout: 5000}, function(error, stdout, stderr) {
-        if (error !== null) {
-            context.bot.send_message(context.channel, stderr.replace(/\r?\n/g, " "), context.sender);
-        }
-
-        else {
-            context.bot.send_message(context.channel, stdout.replace(/\r?\n/g, " "), context.intent);
-        }
-    });
+    this.runCode(context, 'python -c "' + text.replace(/\"/g, '\\"') + '"');
 };
 
 Eval.prototype.runPythonThree = function(context, text) {
-    exec('python3 -c "' + text.replace(/\"/g, '\\"') + '"', {timeout: 5000}, function(error, stdout, stderr) {
-        if (error !== null) {
-            context.bot.send_message(context.channel, stderr.replace(/\r?\n/g, " "), context.sender);
-        }
-
-        else {
-            context.bot.send_message(context.channel, stdout.replace(/\r?\n/g, " "), context.intent);
-        }
-    });
+    this.runCode(context, 'python3 -c "' + text.replace(/\"/g, '\\"') + '"');
 };
 
 Eval.prototype.runNode = function(context, text) {
-    exec('node -e "console.log(' + text.replace(/\"/g, '\\"') + ')"', {timeout: 5000}, function(error, stdout, stderr) {
-        if (error !== null) {
-            context.bot.send_message(context.channel, stderr.replace(/\r?\n/g, " "), context.sender);
-        }
-
-        else {
-            context.bot.send_message(context.channel, stdout.replace(/\r?\n/g, " "), context.intent);
-        }
-    });
+   this.runCode(context,'node -e "console.log(' + text.replace(/\"/g, '\\"') + ')"');
 };
 
 Eval.prototype.runBabel = function(context, text) {
-    exec("babel-node -e 'console.log(" + text.replace(/\'/g, "\\'") + ")'", {timeout: 5000}, function(error, stdout, stderr) {
-        if (error !== null) {
-            context.bot.send_message(context.channel, stderr.replace(/\r?\n/g, " "), context.sender);
-        }
-
-        else {
-            context.bot.send_message(context.channel, stdout.replace(/\r?\n/g, " "), context.intent);
-        }
-    });
+    this.runCode(context, "babel-node -e 'console.log(" + text.replace(/\'/g, "\\'") + ")'");
 };
