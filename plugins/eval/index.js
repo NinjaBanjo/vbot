@@ -21,7 +21,7 @@ Eval.prototype.runCode = function(context, command) {
         else {
             context.bot.send_message(context.channel, stdout.replace(/\r?\n/g, " "), context.intent);
         }
-    });
+    }.bind(this));
 };
 
 Eval.prototype.saveError = function(context, e) {
