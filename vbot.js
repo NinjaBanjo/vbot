@@ -1,7 +1,12 @@
 var net = require("net");
 var tls = require("tls");
 var https = require("https");
+<<<<<<< HEAD
 var fs = require("fs");
+=======
+var EventEmitter = require('events').EventEmitter;
+var util = require('util');
+>>>>>>> 33ec07d... adding channel message logs to flatfile
 
 var Bot = module.exports = function() {
     this.loadProfile(this.init);
@@ -11,6 +16,9 @@ var Bot = module.exports = function() {
         process.stderr.write("\n"+err.stack+"\n\n");
     });
 };
+
+// Inherit the EventEmitter so we can use events
+util.inherits(Bot, EventEmitter);
 
 Bot.prototype.init = function() {
     console.log("connecting...");
@@ -57,6 +65,8 @@ Bot.prototype.parse_message = function(channel, sender, text) {
         sender: sender,
         text: text
     };
+
+    this.emit(this.EVENTS.message, context, text);
 
     if (context.channel === this.profile.nick) context.channel = context.sender;
     var message_matches = text.match(/^[\.\`\!]([^@]+)(?:\s@\s(.*))?$/);
@@ -211,5 +221,9 @@ Bot.prototype.loadProfile = function(cb) {
 		}
 	}.bind(this));
 };
+
+Bot.prototype.EVENTS = {
+    message: 'message'
+}
 
 (new Bot());
