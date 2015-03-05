@@ -1,6 +1,8 @@
 var net = require("net");
 var tls = require("tls");
 var https = require("https");
+var EventEmitter = require('events').EventEmitter;
+var util = require('util');
 
 var Bot = module.exports = function(profile) {
     this.profile = profile;
@@ -11,6 +13,9 @@ var Bot = module.exports = function(profile) {
     });
     this.init();
 };
+
+// Inherit the EventEmitter so we can use events
+util.inherits(Bot, EventEmitter);
 
 Bot.prototype.init = function() {
     console.log("connecting...");
@@ -56,6 +61,8 @@ Bot.prototype.parse_message = function(channel, sender, text) {
         sender: sender,
         text: text
     };
+
+    this.emit(this.EVENTS.message, context, text);
 
     if (context.channel === this.profile.nick) context.channel = context.sender;
     var message_matches = text.match(/^[\.\`\!]([^@]+)(?:\s@\s(.*))?$/);
@@ -196,6 +203,10 @@ Bot.prototype.shorten_url = function(url, cb) {
 	});
 	req.end();
 };
+
+Bot.prototype.EVENTS = {
+    message: 'message'
+}
 
 var profile = require('./profile.js');
 (new Bot(profile));
