@@ -129,7 +129,7 @@ module.exports = {
 	channels: [
 		'#whatever',
         '#somethingelse'
-	]
+	],
 
     //Add and remove plugins here. Only the ones here will be loaded
     plugins: {
