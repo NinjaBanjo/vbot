@@ -1,17 +1,17 @@
 var net = require("net");
 var tls = require("tls");
 var https = require("https");
-<<<<<<< HEAD
 var fs = require("fs");
-=======
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
->>>>>>> 33ec07d... adding channel message logs to flatfile
 
 var Bot = module.exports = function() {
     this.loadProfile(this.init);
     this.buffer = '';
     this.commands = {};
+    this.EVENTS = {
+        message: 'message'
+    }
     process.on('uncaughtException', function(err) {
         process.stderr.write("\n"+err.stack+"\n\n");
     });
@@ -221,9 +221,5 @@ Bot.prototype.loadProfile = function(cb) {
 		}
 	}.bind(this));
 };
-
-Bot.prototype.EVENTS = {
-    message: 'message'
-}
 
 (new Bot());
