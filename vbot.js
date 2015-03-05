@@ -1,15 +1,15 @@
 var net = require("net");
 var tls = require("tls");
 var https = require("https");
+var fs = require("fs");
 
-var Bot = module.exports = function(profile) {
-    this.profile = profile;
+var Bot = module.exports = function() {
+    this.loadProfile(this.init);
     this.buffer = '';
     this.commands = {};
     process.on('uncaughtException', function(err) {
         process.stderr.write("\n"+err.stack+"\n\n");
     });
-    this.init();
 };
 
 Bot.prototype.init = function() {
@@ -21,7 +21,8 @@ Bot.prototype.init = function() {
     this.connection.on('secureConnect', this.secureConnect.bind(this));
     for (var plugin in this.profile.plugins) {
         if (this.profile.plugins.hasOwnProperty(plugin)) {
-            this[plugin] = new this.profile.plugins[plugin](this);
+            var plugin_object = require(this.profile.plugins[plugin]);
+            this[plugin] = new plugin_object(this);
         }
     }
     console.log('plugins loaded');
@@ -197,5 +198,18 @@ Bot.prototype.shorten_url = function(url, cb) {
 	req.end();
 };
 
-var profile = require('./profile.js');
-(new Bot(profile));
+Bot.prototype.loadProfile = function(cb) {
+    fs.readFile('profile.json', function (err, data) {
+		try {
+			if (err) throw err;
+			console.log("Loaded profile");
+			this.profile = JSON.parse(data);
+            cb.call(this);
+		}
+        catch (e) {
+			console.log("JSON Parse Error: "+e);
+		}
+	}.bind(this));
+};
+
+(new Bot());

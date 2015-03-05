@@ -42,11 +42,10 @@ FactoidServer.prototype.learn = function(context, text) {
 
 FactoidServer.prototype.alias = function(context, text) {
      if (text === "") {
-        context.bot.send_message(context.channel, "I think you need to learn how to properly use me.", context.sender);
         return;
     }
-    if (context.channel.indexOf('#') === -1) {
-        context.bot.send_message(context.channel, "Sorry, factoids can't be changed in pm. Go to ##vbot to change factoids.", context.sender);
+    if (context.bot.profile.factoidAdmins.indexOf(context.sender) === -1) {
+        context.bot.send_message(context.channel, "Sorry, only certain people can change factoids. Ask emerson to be added to the list.", context.sender);
         return;
     }
 	var key_matches = text.match(/^([^>]+)\s>\s(.+)$/);
