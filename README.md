@@ -147,6 +147,10 @@ module.exports = {
     //By default, vbot logs all other messages to stdout. Any commands matched here won't be logged.
     noLog: ["NICK", "PART", "QUIT", 372, 375],
 
-    wolframKey: 'AAAAAA-AAAAAAA' //Only if you're using wolfram plugin
+    wolframKey: 'AAAAAA-AAAAAAA', //Only if you're using wolfram plugin
+
+    logger: {
+        logFile: './message.log'
+    }
 };
 ```
