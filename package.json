@@ -1,0 +1,25 @@
+{
+  "name": "vbot",
+  "description": "A simple IRC bot",
+  "version": "0.1.0",
+  "homepage": "https://github.com/emersonveenstra/vbot",
+  "author": {
+    "name": "Emerson Veenstra",
+    "email": "emerson@emersonveenstra.net",
+    "url": "http://emersonveenstra.net/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/emersonveenstra/vbot.git"
+  },
+  "bugs": {
+    "url": "https://github.com/emersonveenstra/vbot/issues"
+  },
+  "keywords": [
+    "irc",
+    "bot"
+  ],
+  "dependencies": {
+    "libxmljs": "^0.13.0"
+  }
+}
