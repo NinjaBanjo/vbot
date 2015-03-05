@@ -1,0 +1,32 @@
+{
+    "host": "chat.freenode.net",
+    "port": 6697,
+    "user": "vbot",
+    "nick": "yournick",
+    "real": "vbot (https://github.com/emersonveenstra/vbot)",
+    "password": "<optional, remove if unused>",
+
+    "channels": [
+        "##vbot"
+    ],
+
+    "logchannel": "##vbot",
+    "plugins": {
+        "caniuse": "./plugins/caniuse/index.js",
+        "eval": "./plugins/eval/index.js",
+        "factoidserv": "./plugins/factoidserv/index.js",
+        "feelinglucky": "./plugins/feelinglucky/index.js",
+        "htmlvalidator":"./plugins/htmlvalidator/index.js",
+        "memo": "./plugins/memo/index.js",
+        "std": "./plugins/std/index.js",
+        "urlshortener": "./plugins/urlshortener/index.js",
+        "wolfram": "./plugins/wolfram/index.js"
+    },
+
+    "wolframKey": "AAAAA-AAAAAAAA",
+
+    "factoids": "./factoids.json",
+    "factoidAdmins": ["emerson"],
+
+    "noLog": ["NICK", "PART", "QUIT", 372]
+}
