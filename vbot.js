@@ -209,7 +209,7 @@ Bot.prototype.shorten_url = function(url, cb) {
 };
 
 Bot.prototype.loadProfile = function(cb) {
-    fs.readFile('profile.json', function (err, data) {
+    fs.readFile(process.argv[2] || './profile.json', function (err, data) {
 		try {
 			if (err) throw err;
 			console.log("Loaded profile");
