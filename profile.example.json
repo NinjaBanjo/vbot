@@ -22,7 +22,8 @@
         "urlshortener": "./plugins/urlshortener/index.js",
         "wolfram": "./plugins/wolfram/index.js",
         "logger": "./plugins/logger",
-        "rocketbin": "./plugins/rocketbin"
+        "rocketbin": "./plugins/rocketbin",
+        "reddit": "./plugins/reddit"
     },
 
     "wolframKey": "AAAAA-AAAAAAAA",
@@ -30,7 +31,7 @@
     "logger": {
         "logFile": "./message.log"
     },
-    
+
     "factoids": "./factoids.json",
     "factoidAdmins": ["emerson"],
 
