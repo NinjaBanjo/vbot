@@ -5,22 +5,23 @@ var fs = require("fs");
 var EventEmitter = require('events').EventEmitter;
 var util = require('util');
 
-var Bot = module.exports = function() {
+var Bot = module.exports = function () {
     this.loadProfile(this.init);
     this.buffer = '';
     this.commands = {};
     this.EVENTS = {
-        message: 'message'
+        message: 'message',
+        join: 'join'
     }
-    process.on('uncaughtException', function(err) {
-        process.stderr.write("\n"+err.stack+"\n\n");
+    process.on('uncaughtException', function (err) {
+        process.stderr.write("\n" + err.stack + "\n\n");
     });
 };
 
 // Inherit the EventEmitter so we can use events
 util.inherits(Bot, EventEmitter);
 
-Bot.prototype.init = function() {
+Bot.prototype.init = function () {
     console.log("connecting...");
     this.connection = tls.connect(this.profile.port, this.profile.host, {});
     this.connection.setKeepAlive(true);
@@ -36,7 +37,7 @@ Bot.prototype.init = function() {
     console.log('plugins loaded');
 };
 
-Bot.prototype.register_command = function(command, callback) {
+Bot.prototype.register_command = function (command, callback) {
     command = command.toLowerCase();
     switch (typeof callback) {
         case "function":
@@ -51,11 +52,11 @@ Bot.prototype.register_command = function(command, callback) {
     }
 };
 
-Bot.prototype.disconnect = function(client, why) {
-    console.log("disconnected: "+why);
+Bot.prototype.disconnect = function (client, why) {
+    console.log("disconnected: " + why);
 };
 
-Bot.prototype.parse_message = function(channel, sender, text) {
+Bot.prototype.parse_message = function (channel, sender, text, message_type) {
     text = text.trim();
 
     var context = {
@@ -65,8 +66,17 @@ Bot.prototype.parse_message = function(channel, sender, text) {
         sender: sender,
         text: text
     };
-
-    this.emit(this.EVENTS.message, context, text);
+    switch (message_type) {
+        case 'message':
+            this.emit(this.EVENTS.message, context, text);
+            break;
+        case 'join':
+            this.emit(this.EVENTS.join, context, text);
+            break;
+        default:
+            this.emit(this.EVENTS.raw, context, text);
+            break;
+    }
 
     if (context.channel === this.profile.nick) context.channel = context.sender;
     var message_matches = text.match(/^[\.\`\!]([^@]+)(?:\s@\s(.*))?$/);
@@ -85,7 +95,7 @@ Bot.prototype.parse_message = function(channel, sender, text) {
     }
 };
 
-Bot.prototype.parse_raw = function(incoming) {
+Bot.prototype.parse_raw = function (incoming) {
     incoming = String(incoming);
     incoming = incoming.replace(/\x03\d{0,2},?\d{1,2}|[\x02\x06\x07\x0f\x16\x17\x1b\x1d\x1f]/g, "");
     incoming = incoming.replace(/[\x00\x01\x04\x05\x08-\x0e\x10-\x15\x18-\x1a\x1c\x1e]/g, "");
@@ -114,16 +124,16 @@ Bot.prototype.parse_raw = function(incoming) {
     return {prefix: prefix, command: command, params: params, message: msg};
 };
 
-Bot.prototype.send_raw = function(message) {
+Bot.prototype.send_raw = function (message) {
     this.connection.write(message + "\r\n", this.encoding);
 };
 
-Bot.prototype.secureConnect = function() {
-    this.send_raw("NICK "+this.profile.nick);
-    this.send_raw("USER "+this.profile.user+" 0 * :"+this.profile.real);
+Bot.prototype.secureConnect = function () {
+    this.send_raw("NICK " + this.profile.nick);
+    this.send_raw("USER " + this.profile.user + " 0 * :" + this.profile.real);
 };
 
-Bot.prototype.receive_data = function(chunk) {
+Bot.prototype.receive_data = function (chunk) {
     this.buffer += chunk;
 
     while (this.buffer) {
@@ -139,30 +149,30 @@ Bot.prototype.receive_data = function(chunk) {
         if (message !== false) {
             switch (message.command) {
                 case 1: // RPL_WELCOME
-                    for (var i=0; i<this.profile.channels.length; i++) {
+                    for (var i = 0; i < this.profile.channels.length; i++) {
                         this.send_raw("JOIN " + this.profile.channels[i]);
                     }
                     console.log("connected");
                     break;
                 case 376:
-                    this.send_message("NickServ", "identify "+this.profile.password);
+                    this.send_message("NickServ", "identify " + this.profile.password);
                     break;
                 case "PING":
-                    this.send_raw("PONG :"+message.message);
+                    this.send_raw("PONG :" + message.message);
                     break;
                 case "PRIVMSG":
                     var mask = message.prefix.match(/^:(.*)!(\S+)@(\S+)/);
                     var text = message.message;
                     var channel = message.params[0];
-                    this.parse_message(channel, mask[1], text);
+                    this.parse_message(channel, mask[1], text, 'message');
                     break;
                 case "JOIN":
                     var channel = message.message || message.params[0];
                     var mask = message.prefix.match(/^:(.*)!(\S+)@(\S+)/);
-                    this.parse_message(channel, mask[1], 'join');
+                    this.parse_message(channel, mask[1], 'join', 'join');
                     break;
                 case "INVITE":
-                    this.send_raw("JOIN "+message.message);
+                    this.send_raw("JOIN " + message.message);
                     console.log(message);
                     break;
                 default:
@@ -174,52 +184,52 @@ Bot.prototype.receive_data = function(chunk) {
     }
 };
 
-Bot.prototype.send_message = function(channel, message, user) {
+Bot.prototype.send_message = function (channel, message, user) {
     if (user) message = user + ": " + message;
     this.send_raw("PRIVMSG " + channel + " :" + message);
 };
 
-Bot.prototype.shorten_url = function(url, cb) {
+Bot.prototype.shorten_url = function (url, cb) {
     var options = {
-	  	hostname: 'www.googleapis.com',
-	  	port: 443,
-	  	path: '/urlshortener/v1/url',
-	  	method: 'POST',
-	  	headers: {
-	  		"Content-Type": "application/json"
-	  	}
-	};
-    var self= this;
-	var req = https.request(options, function(res) {
-	  	res.setEncoding('utf8');
-	  	res.on('data', function (chunk) {
-		    body = JSON.parse(chunk);
+        hostname: 'www.googleapis.com',
+        port: 443,
+        path: '/urlshortener/v1/url',
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json"
+        }
+    };
+    var self = this;
+    var req = https.request(options, function (res) {
+        res.setEncoding('utf8');
+        res.on('data', function (chunk) {
+            body = JSON.parse(chunk);
             cb.call(self, body.id);
-		});
-	});
+        });
+    });
 
-	var payload = '{"longUrl": "'+ url + '"}';
+    var payload = '{"longUrl": "' + url + '"}';
 
-	req.write(payload);
+    req.write(payload);
 
-	req.on('error', function(e) {
-	  	console.log('problem with request: ' + e.message);
-	});
-	req.end();
+    req.on('error', function (e) {
+        console.log('problem with request: ' + e.message);
+    });
+    req.end();
 };
 
-Bot.prototype.loadProfile = function(cb) {
+Bot.prototype.loadProfile = function (cb) {
     fs.readFile('profile.json', function (err, data) {
-		try {
-			if (err) throw err;
-			console.log("Loaded profile");
-			this.profile = JSON.parse(data);
+        try {
+            if (err) throw err;
+            console.log("Loaded profile");
+            this.profile = JSON.parse(data);
             cb.call(this);
-		}
+        }
         catch (e) {
-			console.log("JSON Parse Error: "+e);
-		}
-	}.bind(this));
+            console.log("JSON Parse Error: " + e);
+        }
+    }.bind(this));
 };
 
 (new Bot());
