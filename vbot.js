@@ -9,6 +9,7 @@ var Bot = module.exports = function () {
     this.loadProfile(this.init);
     this.buffer = '';
     this.commands = {};
+    this.loadedPlugins = [];
     this.EVENTS = {
         message: 'message',
         join: 'join'
@@ -28,14 +29,41 @@ Bot.prototype.init = function () {
     this.connection.setEncoding("utf-8");
     this.connection.on('data', this.receive_data.bind(this));
     this.connection.on('secureConnect', this.secureConnect.bind(this));
+    this.loadPlugins();
+};
+
+Bot.prototype.loadPlugins = function() {
     for (var plugin in this.profile.plugins) {
         if (this.profile.plugins.hasOwnProperty(plugin)) {
             var plugin_object = require(this.profile.plugins[plugin]);
-            this[plugin] = new plugin_object(this);
+            this.loadedPlugins.push(new plugin_object(this));
         }
     }
-    console.log('plugins loaded');
-};
+    this.register_command('reload', function(context, text) {context.bot.reload.call(context.bot)});
+    var loadedCount = Object.keys(this.profile.plugins).length;
+    console.log('Loaded ' + loadedCount + ' plugins');
+    this.send_message(this.profile.logchannel, 'Loaded ' + loadedCount + ' plugins');
+}
+
+Bot.prototype.reload = function() {
+    // empty require() cache so plugins get loaded freshly
+    for (var key in this.profile.plugins) {
+        var pluginPath = require.resolve(this.profile.plugins[key]);
+        delete require.cache[pluginPath];
+    }
+    this.loadProfile(function() {
+        var self = this;
+        this.commands = {};
+        this.removeAllListeners();
+        this.loadedPlugins.forEach(function(item) {
+            if(typeof item.unload === "function") {
+                item.unload(self);
+            }
+        });
+        this.loadedPlugins = [];
+        this.loadPlugins();
+    });
+}
 
 Bot.prototype.register_command = function (command, callback) {
     command = command.toLowerCase();
