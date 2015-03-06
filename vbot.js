@@ -218,12 +218,12 @@ Bot.prototype.shorten_url = function (url, cb) {
     req.end();
 };
 
-Bot.prototype.loadProfile = function (cb) {
-    fs.readFile('profile.json', function (err, data) {
-        try {
-            if (err) throw err;
-            console.log("Loaded profile");
-            this.profile = JSON.parse(data);
+Bot.prototype.loadProfile = function(cb) {
+    fs.readFile(process.argv[2] || './profile.json', function (err, data) {
+		try {
+			if (err) throw err;
+			console.log("Loaded profile");
+			this.profile = JSON.parse(data);
             cb.call(this);
         }
         catch (e) {
