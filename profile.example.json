@@ -20,11 +20,17 @@
         "memo": "./plugins/memo/index.js",
         "std": "./plugins/std/index.js",
         "urlshortener": "./plugins/urlshortener/index.js",
-        "wolfram": "./plugins/wolfram/index.js"
+        "wolfram": "./plugins/wolfram/index.js",
+        "logger": "./plugins/logger",
+        "rocketbin": "./plugins/rocketbin"
     },
 
     "wolframKey": "AAAAA-AAAAAAAA",
 
+    "logger": {
+        "logFile": "./message.log"
+    },
+    
     "factoids": "./factoids.json",
     "factoidAdmins": ["emerson"],
 
