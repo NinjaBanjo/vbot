@@ -126,7 +126,7 @@ Bot.prototype.receive_data = function(chunk) {
         message = this.parse_raw(message);
 
         if (message !== false) {
-            switch (message.command) {
+            switch (message.command.toUpperCase()) {
                 case 1: // RPL_WELCOME
                     for (var i=0; i<this.profile.channels.length; i++) {
                         this.send_raw("JOIN " + this.profile.channels[i]);
