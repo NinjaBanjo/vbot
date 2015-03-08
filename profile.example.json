@@ -29,7 +29,7 @@
     "wolframKey": "AAAAA-AAAAAAAA",
 
     "logger": {
-        "logFile": "./message.log"
+        "logFolder": "./log"
     },
 
     "factoids": "./factoids.json",
