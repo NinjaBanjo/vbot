@@ -107,6 +107,7 @@ Bot.prototype.parse_message = function (channel, sender, text, message_type) {
     }
 
     if (context.channel === this.profile.nick) context.channel = context.sender;
+    var trigger_regex = new RegExp("^[\\.\\`\\!]|"+ this.profile.nick + ":\\s?([^@]+)(?:\\s@\\s(.*))?$");
     var message_matches = text.match(/^[\.\`\!]([^@]+)(?:\s@\s(.*))?$/);
     if (message_matches) {
         if (message_matches[2]) context.intent = message_matches[2];
