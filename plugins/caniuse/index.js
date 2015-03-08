@@ -6,13 +6,8 @@
 //
 // All data provided by the good folks at <http://caniuse.com/>
 
-var Utils = require("util");
 var File = require("fs");
-var Path = require('path');
 var HTTPS = require('https');
-
-// Used for console logging
-var MODULE_SHORT_NAME = 'CanIUse';
 
 // Max search matches to return for a fuzzy match
 var MAX_SEARCH_MATCHES = 8;
@@ -28,13 +23,6 @@ var AGENTS_TO_SHOW = {
 	'android': 'Android'
 };
 
-// attempt reload the data every 24 hours
-var DATA_RELOAD_INTERVAL = 24 * 60 * 60 * 1000;
-
-// number of times to retry data retrieval until we give up and
-// wait for the next DATA_RELOAD_INTERVAL
-var MAX_RETRY_ATTEMPTS = 5;
-
 var DATA_SOURCE = {
 	hostname: 'raw.githubusercontent.com',
 	port: 443,
@@ -44,33 +32,12 @@ var DATA_SOURCE = {
 
 var CanIUseServer = module.exports = function(bot) {
 	this.loaded = false;
-	this.attemptsRemaining = MAX_RETRY_ATTEMPTS;
     this.db = {};
 	this.fetchJSON();
 
     bot.register_command('caniuse', this.find.bind(this));
     bot.register_command('ciu', 'caniuse');
     bot.register_command('searchciu', this.search.bind(this));
-};
-
-CanIUseServer.prototype.readJSON = function() {
-	File.readFile(this.filename, function (err, data) {
-		if (err) {
-			throw new Error("CanIUse: Error reading file - " + this.filename);
-		}
-		try {
-			this.parseJSON(data, this.filename);
-			setTimeout(this.readJSON.bind(this), DATA_RELOAD_INTERVAL);
-		} catch (e) {
-			if (this.attemptsRemaining--) {
-				consolePuts("Will attempt to read the file again... (" + (MAX_RETRY_ATTEMPTS - this.attemptsRemaining) + "/" + MAX_RETRY_ATTEMPTS + ")");
-				setTimeout(this.readJSON.bind(this), 1000);
-			} else {
-				consolePuts("Out of read retry attempts!");
-				setTimeout(this.readJSON.bind(this), DATA_RELOAD_INTERVAL);
-			}
-		}
-	}.bind(this));
 };
 
 CanIUseServer.prototype.fetchJSON = function() {
@@ -84,16 +51,10 @@ CanIUseServer.prototype.fetchJSON = function() {
 		res.on('end', function() {
 			try {
 				this.parseJSON(json, DATA_SOURCE.hostname + DATA_SOURCE.path);
-				setTimeout(this.fetchJSON.bind(this), DATA_RELOAD_INTERVAL);
-			} catch (e) {
-				if (this.attemptsRemaining--) {
-					consolePuts("Will attempt to fetch the file again in 10 seconds... (" + (5 - this.attemptsRemaining) + "/" + MAX_RETRY_ATTEMPTS + ")");
-					setTimeout(this.fetchJSON.bind(this), 10000);
-				} else {
-					consolePuts("Out of fetch retry attempts!");
-					setTimeout(this.fetchJSON.bind(this), DATA_RELOAD_INTERVAL);
-				}
 			}
+            catch (e) {
+                console.log(e);
+            }
 		}.bind(this));
 	}.bind(this));
 
@@ -103,14 +64,12 @@ CanIUseServer.prototype.fetchJSON = function() {
 CanIUseServer.prototype.parseJSON = function(json, source) {
 	try {
 		var data = JSON.parse(json);
-		consolePuts("Loaded JSON - " + source);
+		console.log("Loaded JSON - " + source);
 		this.loaded = true;
-		this.attemptsRemaining = MAX_RETRY_ATTEMPTS;
 		this.db = data;
 		this.buildIndex();
 	} catch (e) {
-		consolePuts("JSON Parse Error - " + e);
-		throw e;
+		console.log("JSON Parse Error - " + e);
 	}
 };
 
@@ -258,8 +217,4 @@ function formatResponse(title, supportedList, unsupportedList, overallPercent, k
 	response += ' <http://caniuse.com/' + keyword + '>';
 
 	return response;
-}
-
-function consolePuts(output) {
-	Utils.puts(MODULE_SHORT_NAME + ': ' + output);
 }
