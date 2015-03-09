@@ -3,4 +3,5 @@ profile.json
 node_modules/
 factoids.json
 files/
+log/
 message.log
