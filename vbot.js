@@ -117,7 +117,7 @@ Bot.prototype.parse_message = function (channel, sender, text, message_type) {
             var params = possible_command[2] || '';
             this.commands[command].callback.call(this, context, params, command);
         }
-        else {
+        else if (typeof this.commands.factoid !== "undefined") {
             var factoid = message_matches[1];
             this.commands['factoid'].callback.call(this, context, factoid, 'factoid');
         }
