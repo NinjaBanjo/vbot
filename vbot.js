@@ -176,7 +176,8 @@ Bot.prototype.receive_data = function (chunk) {
         message = this.parse_raw(message);
 
         if (message !== false) {
-            switch (message.command.toUpperCase()) {
+            if (typeof message.command === "string") message.command = message.command.toUpperCase();
+            switch (message.command) {
                 case 1: // RPL_WELCOME
                     for (var i = 0; i < this.profile.channels.length; i++) {
                         this.send_raw("JOIN " + this.profile.channels[i]);
@@ -201,8 +202,9 @@ Bot.prototype.receive_data = function (chunk) {
                     this.parse_message(channel, mask[1], 'join', 'join');
                     break;
                 case "INVITE":
+                    var mask = message.prefix.match(/^:(.*)!(\S+)@(\S+)/);
                     this.send_raw("JOIN " + message.message);
-                    console.log(message);
+                    this.send_message(this.profile.logchannel, mask[0] + " invited me to " + message.message);
                     break;
                 default:
                     var type = this.profile.noLog.indexOf(message.command);
@@ -248,7 +250,8 @@ Bot.prototype.shorten_url = function (url, cb) {
 };
 
 Bot.prototype.loadProfile = function(cb) {
-    fs.readFile(process.argv[2] || './profile.json', function (err, data) {
+    this.profilePath = process.argv[2] || './profile.json';
+    fs.readFile(this.profilePath, function (err, data) {
 		try {
 			if (err) throw err;
 			console.log("Loaded profile");
@@ -259,6 +262,18 @@ Bot.prototype.loadProfile = function(cb) {
             console.log("JSON Parse Error: " + e);
         }
     }.bind(this));
+};
+
+Bot.prototype.saveProfile = function() {
+	try {
+		var write = JSON.stringify(this.profile, null, "\t");
+		fs.writeFile(this.profilePath, write, function (err) {
+			if (err) throw err;
+		});
+	}
+    catch (e) {
+		console.log("Cannot stringify data: "+e.name+": "+e.message);
+	}
 };
 
 (new Bot());
