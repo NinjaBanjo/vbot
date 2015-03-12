@@ -17,16 +17,16 @@ var Eval = module.exports = function(bot) {
 
 Eval.prototype.runCode = function(context, command) {
     exec(command, {timeout: 5000}, function(error, stdout, stderr) {
-        if (error !== null) this.saveError(context, stderr);
+        if (error !== null) this.saveError(context, error, stderr);
         else {
             context.bot.send_message(context.channel, stdout.replace(/\r?\n/g, " "), context.intent);
         }
     }.bind(this));
 };
 
-Eval.prototype.saveError = function(context, e) {
+Eval.prototype.saveError = function(context, e, stderr) {
     var filename = crypto.createHash('sha1').update(new Date().toString()).digest('hex').slice(0,8);
-    fs.writeFile('files/errors/' + filename + ".txt", e, function (err) {
+    fs.writeFile('files/errors/' + filename + ".txt", stderr, function (err) {
         if (err) throw err;
     });
     var output = e.name + ": http://vbot.emersonveenstra.net/errors/" + filename + '.txt';
@@ -74,5 +74,5 @@ Eval.prototype.runNode = function(context, text) {
 };
 
 Eval.prototype.runBabel = function(context, text) {
-    this.runCode(context, "babel-node -e 'console.log(" + text.replace(/\'/g, "\\'") + ")'");
+    this.runCode(context, "babel-node -e '" +  text.replace(/\'/g, "\\'") + "'");
 };
