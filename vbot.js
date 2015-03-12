@@ -12,7 +12,9 @@ var Bot = module.exports = function () {
     this.loadedPlugins = [];
     this.EVENTS = {
         message: 'message',
-        join: 'join'
+        join: 'join',
+        ident: 'ident',
+        invite: 'invite'
     }
     process.on('uncaughtException', function (err) {
         process.stderr.write("\n" + err.stack + "\n\n");
@@ -32,31 +34,33 @@ Bot.prototype.init = function () {
     this.loadPlugins();
 };
 
-Bot.prototype.loadPlugins = function() {
+Bot.prototype.loadPlugins = function () {
     for (var plugin in this.profile.plugins) {
         if (this.profile.plugins.hasOwnProperty(plugin)) {
             var plugin_object = require(this.profile.plugins[plugin]);
             this.loadedPlugins.push(new plugin_object(this));
         }
     }
-    this.register_command('reload', function(context, text) {context.bot.reload.call(context.bot)});
+    this.register_command('reload', function (context, text) {
+        context.bot.reload.call(context.bot)
+    });
     var loadedCount = Object.keys(this.profile.plugins).length;
     console.log('Loaded ' + loadedCount + ' plugins');
     this.send_message(this.profile.logchannel, 'Loaded ' + loadedCount + ' plugins');
 }
 
-Bot.prototype.reload = function() {
+Bot.prototype.reload = function () {
     // empty require() cache so plugins get loaded freshly
     for (var key in this.profile.plugins) {
         var pluginPath = require.resolve(this.profile.plugins[key]);
         delete require.cache[pluginPath];
     }
-    this.loadProfile(function() {
+    this.loadProfile(function () {
         var self = this;
         this.commands = {};
         this.removeAllListeners();
-        this.loadedPlugins.forEach(function(item) {
-            if(typeof item.unload === "function") {
+        this.loadedPlugins.forEach(function (item) {
+            if (typeof item.unload === "function") {
                 item.unload(self);
             }
         });
@@ -84,16 +88,8 @@ Bot.prototype.disconnect = function (client, why) {
     console.log("disconnected: " + why);
 };
 
-Bot.prototype.parse_message = function (channel, sender, text, message_type) {
-    text = text.trim();
-
-    var context = {
-        bot: this,
-        channel: channel,
-        intent: sender,
-        sender: sender,
-        text: text
-    };
+Bot.prototype.parse_message = function (context, message_type) {
+    var text = context.text
     switch (message_type) {
         case 'message':
             this.emit(this.EVENTS.message, context, text);
@@ -107,10 +103,9 @@ Bot.prototype.parse_message = function (channel, sender, text, message_type) {
     }
 
     if (context.channel === this.profile.nick) context.channel = context.sender;
-    var trigger_regex = new RegExp("^[\\.\\`\\!]|"+ this.profile.nick + ":\\s?([^@]+)(?:\\s@\\s(.*))?$");
-    var message_matches = text.match(/^[\.\`\!]([^@]+)(?:\s@\s(.*))?$/);
+    var trigger_regex = new RegExp("^[\\.\\`\\!]|" + this.profile.nick + ":\\s?([^@]+)(?:\\s@\\s(.*))?$");
+    var message_matches = text.match(/^[\.\`\!]([^@]+)/);
     if (message_matches) {
-        if (message_matches[2]) context.intent = message_matches[2];
         var possible_command = message_matches[1].match(/^(\w+)\s?(.*)?$/);
         if (possible_command && this.commands[possible_command[1]]) {
             var command = possible_command[1];
@@ -162,6 +157,25 @@ Bot.prototype.secureConnect = function () {
     this.send_raw("USER " + this.profile.user + " 0 * :" + this.profile.real);
 };
 
+Bot.prototype.buildContext = function (message, overrides) {
+    var sender = message.prefix.match(/^:(.*)!(\S+)@(\S+)/);
+    var context = {
+        bot: this,
+        channel: message.params[0],
+        sender: sender,
+        intent: (message.message ? message.message.match(/(?:\s@\s(.*))?/)[1] : sender),
+        text: message.message || ''
+    };
+    for(var key in overrides) {
+        if(overrides.hasOwnProperty(key)) {
+            context[key] = overrides[key];
+        }
+    }
+    // trim the text
+    context.text.trim();
+    return context
+}
+
 Bot.prototype.receive_data = function (chunk) {
     this.buffer += chunk;
 
@@ -186,25 +200,22 @@ Bot.prototype.receive_data = function (chunk) {
                     break;
                 case 376:
                     this.send_message("NickServ", "identify " + this.profile.password);
+                    this.emit(this.EVENTS.ident, this.buildContext(message), null);
                     break;
                 case "PING":
                     this.send_raw("PONG :" + message.message);
                     break;
                 case "PRIVMSG":
-                    var mask = message.prefix.match(/^:(.*)!(\S+)@(\S+)/);
-                    var text = message.message;
-                    var channel = message.params[0];
-                    this.parse_message(channel, mask[1], text, 'message');
+                    this.parse_message(this.buildContext(message), 'message');
                     break;
                 case "JOIN":
-                    var channel = message.message || message.params[0];
-                    var mask = message.prefix.match(/^:(.*)!(\S+)@(\S+)/);
-                    this.parse_message(channel, mask[1], 'join', 'join');
+                    this.parse_message(this.buildContext(message), 'join');
                     break;
                 case "INVITE":
                     var mask = message.prefix.match(/^:(.*)!(\S+)@(\S+)/);
                     this.send_raw("JOIN " + message.message);
                     this.send_message(this.profile.logchannel, mask[0] + " invited me to " + message.message);
+                    this.emit(this.EVENTS.invite, this.buildContext(message))
                     break;
                 default:
                     var type = this.profile.noLog.indexOf(message.command);
@@ -249,13 +260,13 @@ Bot.prototype.shorten_url = function (url, cb) {
     req.end();
 };
 
-Bot.prototype.loadProfile = function(cb) {
+Bot.prototype.loadProfile = function (cb) {
     this.profilePath = process.argv[2] || './profile.json';
     fs.readFile(this.profilePath, function (err, data) {
-		try {
-			if (err) throw err;
-			console.log("Loaded profile");
-			this.profile = JSON.parse(data);
+        try {
+            if (err) throw err;
+            console.log("Loaded profile");
+            this.profile = JSON.parse(data);
             cb.call(this);
         }
         catch (e) {
@@ -264,16 +275,16 @@ Bot.prototype.loadProfile = function(cb) {
     }.bind(this));
 };
 
-Bot.prototype.saveProfile = function() {
-	try {
-		var write = JSON.stringify(this.profile, null, "\t");
-		fs.writeFile(this.profilePath, write, function (err) {
-			if (err) throw err;
-		});
-	}
+Bot.prototype.saveProfile = function () {
+    try {
+        var write = JSON.stringify(this.profile, null, "\t");
+        fs.writeFile(this.profilePath, write, function (err) {
+            if (err) throw err;
+        });
+    }
     catch (e) {
-		console.log("Cannot stringify data: "+e.name+": "+e.message);
-	}
+        console.log("Cannot stringify data: " + e.name + ": " + e.message);
+    }
 };
 
 (new Bot());
