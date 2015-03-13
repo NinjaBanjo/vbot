@@ -9,6 +9,6 @@ Reddit.prototype.onMessage = function (context, text) {
     if ((regex).test(text) && !(not_regex).test(text)) {
         var subreddit = text.match(regex)[1];
         if (subreddit.indexOf('/') === 0) subreddit = subreddit.substr(1);
-        context.bot.send_message(context.channel, 'http://reddit.com/' + subreddit, context.intent);
+        context.bot.send_message(context.channel, 'http://reddit.com/' + subreddit);
     }
 }
