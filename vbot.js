@@ -103,7 +103,6 @@ Bot.prototype.parse_message = function (context, message_type) {
     }
 
     if (context.channel === this.profile.nick) context.channel = context.sender;
-    var trigger_regex = new RegExp("^[\\.\\`\\!]|" + this.profile.nick + ":\\s?([^@]+)(?:\\s@\\s(.*))?$");
     var message_matches = text.match(/^[\.\`\!]([^@]+)/);
     if (message_matches) {
         var possible_command = message_matches[1].match(/^(\w+)\s?(.*)?$/);
@@ -159,11 +158,12 @@ Bot.prototype.secureConnect = function () {
 
 Bot.prototype.buildContext = function (message, overrides) {
     var sender = message.prefix.match(/^:(.*)!(\S+)@(\S+)/);
+    var intent = message.message.match(/(?:\s@\s(.*))/);
     var context = {
         bot: this,
         channel: message.params[0],
         sender: sender,
-        intent: (message.message ? message.message.match(/(?:\s@\s(.*))?/)[1] : sender),
+        intent: (intent !== null ? intent[1] : sender[1]),
         text: message.message || ''
     };
     for(var key in overrides) {
