@@ -162,7 +162,7 @@ Bot.prototype.buildContext = function (message, overrides) {
     var context = {
         bot: this,
         channel: message.params[0],
-        sender: sender,
+        sender: sender[1],
         intent: (intent !== null ? intent[1] : sender[1]),
         text: message.message || ''
     };
