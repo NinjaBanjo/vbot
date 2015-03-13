@@ -26,7 +26,7 @@ FactoidServer.prototype.learn = function(context, text) {
     if (text === "") {
         return;
     }
-    if (context.bot.profile.factoidAdmins.indexOf(context.sender) === -1) {
+    if (context.bot.profile.admins.indexOf(context.sender) === -1) {
         context.bot.send_message(context.channel, "Sorry, only certain people can change factoids. Ask emerson to be added to the list.", context.sender);
         return;
     }
@@ -43,7 +43,7 @@ FactoidServer.prototype.alias = function(context, text) {
      if (text === "") {
         return;
     }
-    if (context.bot.profile.factoidAdmins.indexOf(context.sender) === -1) {
+    if (context.bot.profile.admins.indexOf(context.sender) === -1) {
         context.bot.send_message(context.channel, "Sorry, only certain people can change factoids. Ask emerson to be added to the list.", context.sender);
         return;
     }
@@ -111,7 +111,7 @@ FactoidServer.prototype.forget = function(context, text) {
 	 if (text === "") {
         return;
     }
-    if (context.bot.profile.factoidAdmins.indexOf(context.sender) === -1) {
+    if (context.bot.profile.admins.indexOf(context.sender) === -1) {
         context.bot.send_message(context.channel, "Sorry, only certain people can change factoids. Ask emerson to be added to the list.", context.sender);
         return;
     }
