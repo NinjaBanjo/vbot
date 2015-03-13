@@ -158,11 +158,12 @@ Bot.prototype.secureConnect = function () {
 
 Bot.prototype.buildContext = function (message, overrides) {
     var sender = message.prefix.match(/^:(.*)!(\S+)@(\S+)/);
+    var intent = message.message.match(/(?:\s@\s(.*))/);
     var context = {
         bot: this,
         channel: message.params[0],
-        sender: sender,
-        intent: (message.message ? message.message.match(/(?:\s@\s(.*))/)[1] : sender),
+        sender: sender[1],
+        intent: (intent !== null ? intent[1] : sender[1]),
         text: message.message || ''
     };
     for(var key in overrides) {
