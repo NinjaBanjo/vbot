@@ -245,7 +245,8 @@ Bot.prototype.shorten_url = function (url, cb) {
     var req = https.request(options, function (res) {
         res.setEncoding('utf8');
         res.on('data', function (chunk) {
-            body = JSON.parse(chunk);
+            var body = JSON.parse(chunk);
+            var shorturl = body.id || url;
             cb.call(self, body.id);
         });
     });
