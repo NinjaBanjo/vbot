@@ -11,7 +11,8 @@ var Bot = module.exports = function () {
     this.commands = {};
     this.loadedPlugins = [];
     this.EVENTS = {
-        message: 'message',
+        receive_message: 'receiveMessage',
+        send_message: 'sendMessage',
         join: 'join',
         ident: 'ident',
         invite: 'invite'
@@ -92,7 +93,7 @@ Bot.prototype.parse_message = function (context, message_type) {
     var text = context.text
     switch (message_type) {
         case 'message':
-            this.emit(this.EVENTS.message, context, text);
+            this.emit(this.EVENTS.receive_message, context, text);
             break;
         case 'join':
             this.emit(this.EVENTS.join, context, text);
@@ -229,7 +230,8 @@ Bot.prototype.receive_data = function (chunk) {
 
 Bot.prototype.send_message = function (channel, message, user) {
     if (user) message = user + ": " + message;
-    this.send_raw("PRIVMSG " + channel + " :" + message);
+    this.send_raw("PRIVMSG " + channel + " :" + message)
+    this.emit(this.EVENTS.send_message, {bot: this, channel: channel, sender: this.profile.nick, text: message, user: user || null}, message);
 };
 
 Bot.prototype.shorten_url = function (url, cb) {

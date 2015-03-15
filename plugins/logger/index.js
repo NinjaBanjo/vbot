@@ -15,10 +15,12 @@ var Logger = module.exports = function (bot) {
     });
 
     // Register with the message event so we can log messages
-    bot.on(bot.EVENTS.message, this.logMessage);
+    bot.on(bot.EVENTS.receive_message, this.logMessage);
+    bot.on(bot.EVENTS.send_message, this.logMessage)
 };
 
 Logger.prototype.logMessage = function (context, text) {
+    if(context.channel.split('').splice(0,1)[0] !== "#") return;
     var logFolder = context.bot.profile.logger.logFolder,
         logFile = context.channel.toLowerCase(),
         loggedLine = '[' + context.sender + ']:' + ' ' + text;

@@ -1,5 +1,5 @@
 var Reddit = module.exports = function (bot) {
-    bot.on(bot.EVENTS.message, this.onMessage);
+    bot.on(bot.EVENTS.receive_message, this.onMessage);
 }
 
 Reddit.prototype.onMessage = function (context, text) {
