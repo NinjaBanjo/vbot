@@ -11,7 +11,8 @@ var Bot = module.exports = function () {
     this.commands = {};
     this.loadedPlugins = [];
     this.EVENTS = {
-        message: 'message',
+        receive_message: 'receiveMessage',
+        send_message: 'sendMessage',
         join: 'join',
         ident: 'ident',
         invite: 'invite'
@@ -92,7 +93,7 @@ Bot.prototype.parse_message = function (context, message_type) {
     var text = context.text
     switch (message_type) {
         case 'message':
-            this.emit(this.EVENTS.message, context, text);
+            this.emit(this.EVENTS.receive_message, context, text);
             break;
         case 'join':
             this.emit(this.EVENTS.join, context, text);
@@ -158,12 +159,13 @@ Bot.prototype.secureConnect = function () {
 
 Bot.prototype.buildContext = function (message, overrides) {
     var sender = message.prefix.match(/^:(.*)!(\S+)@(\S+)/);
-    var intent = message.message.match(/(?:\s@\s(.*))/);
+    if(sender !== null) sender = sender[1];
+    var intent = (typeof message.message !== "undefined" ? message.message.match(/(?:\s@\s(.*))/) : null);
     var context = {
         bot: this,
         channel: message.params[0],
-        sender: sender[1],
-        intent: (intent !== null ? intent[1] : sender[1]),
+        sender: sender,
+        intent: (intent !== null ? intent[1] : sender),
         text: message.message || ''
     };
     for(var key in overrides) {
@@ -193,9 +195,12 @@ Bot.prototype.receive_data = function (chunk) {
             if (typeof message.command === "string") message.command = message.command.toUpperCase();
             switch (message.command) {
                 case 1: // RPL_WELCOME
-                    for (var i = 0; i < this.profile.channels.length; i++) {
-                        this.send_raw("JOIN " + this.profile.channels[i]);
-                    }
+                    // Delay channel joining to give us time to identify and get a host mask
+                    setTimeout(function() {
+                        for (var i = 0; i < this.profile.channels.length; i++) {
+                            this.send_raw("JOIN " + this.profile.channels[i]);
+                        }
+                    }.bind(this), 10000);
                     console.log("connected");
                     break;
                 case 376:
@@ -228,7 +233,8 @@ Bot.prototype.receive_data = function (chunk) {
 
 Bot.prototype.send_message = function (channel, message, user) {
     if (user) message = user + ": " + message;
-    this.send_raw("PRIVMSG " + channel + " :" + message);
+    this.send_raw("PRIVMSG " + channel + " :" + message)
+    this.emit(this.EVENTS.send_message, {bot: this, channel: channel, sender: this.profile.nick, text: message, user: user || null}, message);
 };
 
 Bot.prototype.shorten_url = function (url, cb) {
