@@ -33,7 +33,7 @@
     },
 
     "factoids": "./factoids.json",
-    "factoidAdmins": ["emerson"],
+    "admins": ["emerson"],
 
     "noLog": ["NICK", "PART", "QUIT", 372]
 }
