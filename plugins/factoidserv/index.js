@@ -71,7 +71,7 @@ FactoidServer.prototype.alias = function(context, text) {
 
 
 FactoidServer.prototype.find = function(context, text) {
-	key = text.toLowerCase();
+	key = text.split(' ')[0].toLowerCase();
 
 	if (typeof this.db[key] === "undefined") {
 		// This is noisy...
