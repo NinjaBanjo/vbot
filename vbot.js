@@ -195,9 +195,12 @@ Bot.prototype.receive_data = function (chunk) {
             if (typeof message.command === "string") message.command = message.command.toUpperCase();
             switch (message.command) {
                 case 1: // RPL_WELCOME
-                    for (var i = 0; i < this.profile.channels.length; i++) {
-                        this.send_raw("JOIN " + this.profile.channels[i]);
-                    }
+                    // Delay channel joining to give us time to identify and get a host mask
+                    setTimeout(function() {
+                        for (var i = 0; i < this.profile.channels.length; i++) {
+                            this.send_raw("JOIN " + this.profile.channels[i]);
+                        }
+                    }.bind(this), 10000);
                     console.log("connected");
                     break;
                 case 376:
