@@ -15,7 +15,8 @@ var Bot = module.exports = function () {
         send_message: 'sendMessage',
         join: 'join',
         ident: 'ident',
-        invite: 'invite'
+        invite: 'invite',
+        names: 'names'
     }
     process.on('uncaughtException', function (err) {
         process.stderr.write("\n" + err.stack + "\n\n");
@@ -34,6 +35,27 @@ Bot.prototype.init = function () {
     this.connection.on('secureConnect', this.secureConnect.bind(this));
     this.loadPlugins();
 };
+
+Bot.prototype.getUsersInChannel = function (channel, cb, context) {
+    var self = this;
+    var receiveNames = function (message) {
+        if (message.params[2] === channel) {
+            var userList = message.message.split(' ').map(function (item) {
+                var user = item
+                    .replace('+', '')
+                    .replace('@', '')
+                    .replace('~', '')
+                    .replace('%', '')
+                    .replace('&', '');
+                return user
+            });
+            self.removeListener(self.EVENTS.names, receiveNames);
+            cb.call(context | null, userList);
+        }
+    }
+    this.on(this.EVENTS.names, receiveNames);
+    this.send_raw('NAMES ' + channel);
+}
 
 Bot.prototype.loadPlugins = function () {
     for (var plugin in this.profile.plugins) {
@@ -159,7 +181,7 @@ Bot.prototype.secureConnect = function () {
 
 Bot.prototype.buildContext = function (message, overrides) {
     var sender = message.prefix.match(/^:(.*)!(\S+)@(\S+)/);
-    if(sender !== null) sender = sender[1];
+    if (sender !== null) sender = sender[1];
     var intent = (typeof message.message !== "undefined" ? message.message.match(/(?:\s@\s(.*))/) : null);
     var context = {
         bot: this,
@@ -168,8 +190,8 @@ Bot.prototype.buildContext = function (message, overrides) {
         intent: (intent !== null ? intent[1] : sender),
         text: message.message || ''
     };
-    for(var key in overrides) {
-        if(overrides.hasOwnProperty(key)) {
+    for (var key in overrides) {
+        if (overrides.hasOwnProperty(key)) {
             context[key] = overrides[key];
         }
     }
@@ -196,7 +218,7 @@ Bot.prototype.receive_data = function (chunk) {
             switch (message.command) {
                 case 1: // RPL_WELCOME
                     // Delay channel joining to give us time to identify and get a host mask
-                    setTimeout(function() {
+                    setTimeout(function () {
                         for (var i = 0; i < this.profile.channels.length; i++) {
                             this.send_raw("JOIN " + this.profile.channels[i]);
                         }
@@ -206,6 +228,9 @@ Bot.prototype.receive_data = function (chunk) {
                 case 376:
                     this.send_message("NickServ", "identify " + this.profile.password);
                     this.emit(this.EVENTS.ident, this.buildContext(message), null);
+                    break;
+                case 353:
+                    this.emit(this.EVENTS.names, message);
                     break;
                 case "PING":
                     this.send_raw("PONG :" + message.message);
@@ -234,7 +259,13 @@ Bot.prototype.receive_data = function (chunk) {
 Bot.prototype.send_message = function (channel, message, user) {
     if (user) message = user + ": " + message;
     this.send_raw("PRIVMSG " + channel + " :" + message)
-    this.emit(this.EVENTS.send_message, {bot: this, channel: channel, sender: this.profile.nick, text: message, user: user || null}, message);
+    this.emit(this.EVENTS.send_message, {
+        bot: this,
+        channel: channel,
+        sender: this.profile.nick,
+        text: message,
+        user: user || null
+    }, message);
 };
 
 Bot.prototype.shorten_url = function (url, cb) {
